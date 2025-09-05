@@ -83,7 +83,7 @@ const SignUpPage = () => {
           </div>
           <h1 className="text-5xl font-bold mb-6 font-space-grotesk">
             Begin Your
-            <span className="block gradient-text">Learning Journey</span>
+            <span className="block text-cyan-400">Learning Journey</span>``
           </h1>
           <p className="text-xl mb-8 text-white/90">
             Join thousands of students who have discovered their perfect career path through our AI-powered guidance platform.

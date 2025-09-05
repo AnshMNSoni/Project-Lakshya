@@ -58,7 +58,7 @@ const SignInPage = () => {
           </div>
           <h1 className="text-5xl font-bold mb-6 font-space-grotesk">
             Your Future
-            <span className="block gradient-text">Starts Here</span>
+            <span className="block text-cyan-400">Starts Here</span>
           </h1>
           <p className="text-xl mb-8 text-white/90">
             AI-powered career guidance platform helping students make informed education decisions and discover their perfect career path.
