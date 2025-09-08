@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Footer from '@/components/layout/Footer';
-import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { AnimatedThemeToggler } from '@/magicui/animated-theme-toggler';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
@@ -96,7 +96,7 @@ const Dashboard = () => {
             <div className="flex items-center space-x-1 sm:space-x-3">
               {/* Desktop Theme Toggle */}
               <div className="hidden sm:block">
-                <ThemeToggle />
+                <AnimatedThemeToggler className="h-8 w-8" />
               </div>
 
               {/* Desktop Menu */}
@@ -177,7 +177,7 @@ const Dashboard = () => {
                           {/* Theme Toggle */}
                           <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-card/30">
                             <span className="text-base font-medium">Theme</span>
-                            <ThemeToggle />
+                            <AnimatedThemeToggler className="h-8 w-8" />
                           </div>
 
                           {/* Profile Link */}

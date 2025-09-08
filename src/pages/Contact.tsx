@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Sparkles, Mail, Phone, MapPin, Clock, Send, MessageCircle, CheckCircle } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
-import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { AnimatedThemeToggler } from '@/magicui/animated-theme-toggler';
 import { useForm, ValidationError } from '@formspree/react';
 
 const Contact = () => {
@@ -64,7 +64,7 @@ const Contact = () => {
                   Lakshya
                 </span>
               </Link>
-              <ThemeToggle />
+              <AnimatedThemeToggler className="h-8 w-8" />
             </div>
           </div>
         </div>

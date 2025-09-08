@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Sparkles, Brain, TrendingUp, Target, Zap, Play } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
-import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { AnimatedThemeToggler } from '@/magicui/animated-theme-toggler';
 
 const SmartAnalysis = () => {
   const analysisSteps = [
@@ -36,7 +36,7 @@ const SmartAnalysis = () => {
                   Lakshya
                 </span>
               </Link>
-              <ThemeToggle />
+              <AnimatedThemeToggler className="h-8 w-8" />
             </div>
           </div>
         </div>

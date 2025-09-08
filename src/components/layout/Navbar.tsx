@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Sparkles, User, LogOut, Settings, Menu, X } from 'lucide-react';
-import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { AnimatedThemeToggler } from '@/magicui/animated-theme-toggler';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useState } from 'react';
 
@@ -66,7 +66,7 @@ const Navbar = ({ isAuthenticated = false }: NavbarProps) => {
             
             {/* Theme Toggle - positioned next to logo */}
             <div className="hidden sm:block">
-              <ThemeToggle />
+              <AnimatedThemeToggler className="h-8 w-8" />
             </div>
           </div>
 
@@ -79,7 +79,7 @@ const Navbar = ({ isAuthenticated = false }: NavbarProps) => {
           <div className="flex items-center space-x-4">
             {/* Mobile theme toggle */}
             <div className="sm:hidden">
-              <ThemeToggle />
+              <AnimatedThemeToggler className="h-8 w-8" />
             </div>
 
             {isAuthenticated ? (

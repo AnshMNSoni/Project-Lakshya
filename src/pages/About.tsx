@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Sparkles, Target, Users, Zap, Heart, Award, BookOpen, MapPin, Brain } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
-import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { AnimatedThemeToggler } from '@/magicui/animated-theme-toggler';
 
 const About = () => {
   return (
@@ -29,7 +29,7 @@ const About = () => {
                   Lakshya
                 </span>
               </Link>
-              <ThemeToggle />
+              <AnimatedThemeToggler className="h-8 w-8" />
             </div>
           </div>
         </div>
