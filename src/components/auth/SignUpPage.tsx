@@ -5,8 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Eye, EyeOff, Mail, Lock, User, Phone, Shield, Sparkles } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Phone, Shield, Sparkles, Check, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import heroImage from '@/assets/hero-education.jpg';
 
 const SignUpPage = () => {
@@ -24,7 +25,30 @@ const SignUpPage = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Password strength validation
+  const validatePassword = (password) => {
+    const criteria = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /\d/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    };
+
+    const strength = Object.values(criteria).filter(Boolean).length;
+    return { criteria, strength, isStrong: strength >= 4 };
+  };
+
+  // Mobile number validation
+  const validateMobileNumber = (phone) => {
+    const cleanPhone = phone.replace(/\D/g, ''); // Remove non-digits
+    return cleanPhone.length === 10 && /^[6-9]\d{9}$/.test(cleanPhone); // Indian mobile format
+  };
+
+  const passwordValidation = validatePassword(formData.password);
+  const isMobileValid = validateMobileNumber(formData.phone);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!robotVerified) {
@@ -32,6 +56,24 @@ const SignUpPage = () => {
         variant: "destructive",
         title: "Verification Required",
         description: "Please verify that you are not a robot",
+      });
+      return;
+    }
+
+    if (!passwordValidation.isStrong) {
+      toast({
+        variant: "destructive",
+        title: "Weak Password",
+        description: "Please create a stronger password meeting all criteria",
+      });
+      return;
+    }
+
+    if (!isMobileValid) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Mobile Number",
+        description: "Please enter a valid 10-digit mobile number",
       });
       return;
     }
@@ -47,22 +89,73 @@ const SignUpPage = () => {
 
     setIsLoading(true);
     
-    // Simulate registration process
-    setTimeout(() => {
-      toast({
-        title: "Account Created Successfully!",
-        description: "Welcome to EduGuide. Setting up your profile...",
+    try {
+      const { error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            full_name: formData.fullName,
+            phone: formData.phone,
+          }
+        }
       });
-      navigate('/profile-setup');
+
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Sign Up Failed",
+          description: error.message,
+        });
+      } else {
+        toast({
+          title: "Account Created Successfully!",
+          description: "Please check your email to verify your account.",
+        });
+        navigate('/sign-in');
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Sign Up Failed",
+        description: "An unexpected error occurred. Please try again.",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    
+    // For phone number, allow only digits and limit to 10
+    if (name === 'phone') {
+      const digitsOnly = value.replace(/\D/g, '');
+      if (digitsOnly.length <= 10) {
+        setFormData({
+          ...formData,
+          [name]: digitsOnly
+        });
+      }
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value
+      });
+    }
+  };
+
+  const getPasswordStrengthColor = (strength) => {
+    if (strength < 2) return 'text-red-500';
+    if (strength < 4) return 'text-yellow-500';
+    return 'text-green-500';
+  };
+
+  const getPasswordStrengthText = (strength) => {
+    if (strength < 2) return 'Weak';
+    if (strength < 4) return 'Medium';
+    return 'Strong';
   };
 
   return (
@@ -177,13 +270,29 @@ const SignUpPage = () => {
                       id="phone"
                       name="phone"
                       type="tel"
-                      placeholder="Enter your mobile number"
+                      placeholder="Enter 10-digit mobile number"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className="pl-10 bg-card/50 border-border/50 focus:border-primary transition-colors"
+                      className={`pl-10 bg-card/50 border-border/50 focus:border-primary transition-colors ${
+                        formData.phone && !isMobileValid ? 'border-red-500' : ''
+                      }`}
                       required
                     />
+                    {formData.phone && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        {isMobileValid ? (
+                          <Check className="w-4 h-4 text-green-500" />
+                        ) : (
+                          <X className="w-4 h-4 text-red-500" />
+                        )}
+                      </div>
+                    )}
                   </div>
+                  {formData.phone && !isMobileValid && (
+                    <p className="text-xs text-red-500 mt-1">
+                      Please enter a valid 10-digit mobile number
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -216,6 +325,40 @@ const SignUpPage = () => {
                       )}
                     </Button>
                   </div>
+                  
+                  {/* Password Strength Indicator */}
+                  {formData.password && (
+                    <div className="mt-2 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">Password Strength:</span>
+                        <span className={`text-xs font-medium ${getPasswordStrengthColor(passwordValidation.strength)}`}>
+                          {getPasswordStrengthText(passwordValidation.strength)}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className={`flex items-center space-x-1 ${passwordValidation.criteria.length ? 'text-green-600' : 'text-red-500'}`}>
+                          {passwordValidation.criteria.length ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                          <span>8+ characters</span>
+                        </div>
+                        <div className={`flex items-center space-x-1 ${passwordValidation.criteria.uppercase ? 'text-green-600' : 'text-red-500'}`}>
+                          {passwordValidation.criteria.uppercase ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                          <span>Uppercase</span>
+                        </div>
+                        <div className={`flex items-center space-x-1 ${passwordValidation.criteria.lowercase ? 'text-green-600' : 'text-red-500'}`}>
+                          {passwordValidation.criteria.lowercase ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                          <span>Lowercase</span>
+                        </div>
+                        <div className={`flex items-center space-x-1 ${passwordValidation.criteria.number ? 'text-green-600' : 'text-red-500'}`}>
+                          {passwordValidation.criteria.number ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                          <span>Number</span>
+                        </div>
+                        <div className={`flex items-center space-x-1 ${passwordValidation.criteria.special ? 'text-green-600' : 'text-red-500'}`}>
+                          {passwordValidation.criteria.special ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                          <span>Special char</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -231,7 +374,9 @@ const SignUpPage = () => {
                       placeholder="Confirm your password"
                       value={formData.confirmPassword}
                       onChange={handleInputChange}
-                      className="pl-10 pr-10 bg-card/50 border-border/50 focus:border-primary transition-colors"
+                      className={`pl-10 pr-10 bg-card/50 border-border/50 focus:border-primary transition-colors ${
+                        formData.confirmPassword && formData.password !== formData.confirmPassword ? 'border-red-500' : ''
+                      }`}
                       required
                     />
                     <Button
@@ -248,6 +393,11 @@ const SignUpPage = () => {
                       )}
                     </Button>
                   </div>
+                  {formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                    <p className="text-xs text-red-500 mt-1">
+                      Passwords do not match
+                    </p>
+                  )}
                 </div>
 
                 {/* Robot Verification (Visual Only) */}
