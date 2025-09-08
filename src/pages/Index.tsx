@@ -15,7 +15,7 @@ const Index = () => {
         <div className="absolute inset-0">
           <img
             src={heroImage}
-            alt="EduGuide - Smart Career Guidance Platform"
+            alt="Lakshya - Smart Career Guidance Platform"
             className="w-full h-full object-cover opacity-20"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-background/80 to-background/90" />
