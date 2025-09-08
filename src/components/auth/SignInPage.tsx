@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, EyeOff, Mail, Lock, User, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import heroImage from '@/assets/hero-education.jpg';
 
 const SignInPage = () => {
@@ -13,24 +14,82 @@ const SignInPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
+    mobile: '',
     password: ''
   });
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  const validateForm = () => {
+    // Mobile number validation (10 digits)
+    if (!/^\d{10}$/.test(formData.mobile)) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Mobile Number",
+        description: "Mobile number must be exactly 10 digits",
+      });
+      return false;
+    }
+
+    // Password validation (minimum 8 characters, at least one letter and one number)
+    if (formData.password.length < 8) {
+      toast({
+        variant: "destructive",
+        title: "Weak Password",
+        description: "Password must be at least 8 characters long",
+      });
+      return false;
+    }
+
+    if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(formData.password)) {
+      toast({
+        variant: "destructive",
+        title: "Weak Password",
+        description: "Password must contain at least one letter and one number",
+      });
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
     setIsLoading(true);
     
-    // Simulate login process
-    setTimeout(() => {
-      toast({
-        title: "Welcome back!",
-        description: "Successfully signed in to EduGuide",
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
       });
-      navigate('/dashboard');
+
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Sign In Failed",
+          description: error.message,
+        });
+      } else {
+        toast({
+          title: "Welcome back!",
+          description: "Successfully signed in to Lakshya",
+        });
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Sign In Failed",
+        description: "An unexpected error occurred. Please try again.",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,7 +117,7 @@ const SignInPage = () => {
           </div>
           <h1 className="text-5xl font-bold mb-6 font-space-grotesk">
             Your Future
-            <span className="block text-cyan-400">Starts Here</span>
+            <span className="block gradient-text">Starts Here</span>
           </h1>
           <p className="text-xl mb-8 text-white/90">
             AI-powered career guidance platform helping students make informed education decisions and discover their perfect career path.
@@ -124,6 +183,27 @@ const SignInPage = () => {
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="mobile" className="text-sm font-medium">
+                    Mobile Number
+                  </Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      id="mobile"
+                      name="mobile"
+                      type="tel"
+                      placeholder="9876543210"
+                      value={formData.mobile}
+                      onChange={handleInputChange}
+                      className="pl-10 bg-card/50 border-border/50 focus:border-primary transition-colors"
+                      maxLength={10}
+                      required
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">Enter 10-digit mobile number</p>
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="password" className="text-sm font-medium">
                     Password
                   </Label>
@@ -153,6 +233,9 @@ const SignInPage = () => {
                       )}
                     </Button>
                   </div>
+                  <p className="text-xs text-muted-foreground">
+                    Min 8 characters with letters and numbers
+                  </p>
                 </div>
 
                 <div className="flex items-center justify-between">

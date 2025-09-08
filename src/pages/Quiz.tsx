@@ -1,12 +1,117 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, BookOpen, Clock, Award, Target, CheckCircle, Play } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { ArrowLeft, BookOpen, Clock, CheckCircle, Play, MapPin, Sparkles } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
+import { useToast } from '@/hooks/use-toast';
 
 const Quiz = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isStarted, setIsStarted] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState({});
+  const [questions, setQuestions] = useState([]);
+
+  const quizSteps = [
+    { title: 'Personality Analysis', description: 'Understand your work style and preferences', duration: '12 min' }
+  ];
+
+  const personalityQuestions = {
+    Extraversion: [
+      'I enjoy being the center of attention.',
+      'I feel energized when I spend time with many people.',
+      'I like to start conversations.'
+    ],
+    Neuroticism: [
+      'I often feel anxious or tense.',
+      'I get upset easily.',
+      'I worry about many different things.'
+    ],
+    Agreeableness: [
+      'I sympathize with others’ feelings.',
+      'I am interested in other people’s problems.',
+      'I take time out for others.'
+    ],
+    Conscientiousness: [
+      'I like to plan everything in detail.',
+      'I follow through on commitments.',
+      'I pay attention to details.'
+    ],
+    Openness: [
+      'I enjoy trying new activities.',
+      'I like to think about abstract ideas.',
+      'I have a vivid imagination.'
+    ]
+  };
+
+  const responseOptions = [
+    'Disagree',
+    'Slightly Disagree',
+    'Neutral',
+    'Slightly Agree',
+    'Agree'
+  ];
+
+  // Generate questions for the Personality Analysis step
+  const getQuestionsForStep = () => {
+    return Object.entries(personalityQuestions).flatMap(([trait, questions]) =>
+      questions.map((q, index) => ({
+        id: `${trait}-${index}`,
+        text: q,
+        trait
+      }))
+    );
+  };
+
+  // Update questions only when the step changes
+  useEffect(() => {
+    setQuestions(getQuestionsForStep());
+  }, [currentStep]);
+
+  const handleStartQuiz = () => {
+    setIsStarted(true);
+    toast({
+      title: "Quiz Started!",
+      description: "Your career assessment quiz has begun. Take your time with each section.",
+    });
+  };
+
+  const handleAnswer = (questionId, answer) => {
+    setAnswers((prev) => ({
+      ...prev,
+      [questionId]: answer
+    }));
+
+    // Only move to the next question if not on the last question
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    }
+  };
+
+  const handleCompleteQuiz = () => {
+    toast({
+      title: "Quiz Complete!",
+      description: "Great job! Your results are being processed for personalized recommendations.",
+    });
+    setTimeout(() => {
+      navigate('/dashboard');
+    }, 2000);
+  };
+
+  const handlePrevious = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    }
+  };
+
+  // Determine if the Previous button should be disabled
+  const isPreviousDisabled = () => {
+    return currentQuestionIndex === 0 || currentQuestionIndex === questions.length - 1;
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -63,74 +168,15 @@ const Quiz = () => {
             </CardHeader>
             <CardContent className="relative z-10 space-y-8">
               {/* Quiz Sections */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
-                  <CardHeader className="pb-3">
-                    <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center mb-2">
-                      <Target className="w-5 h-5 text-white" />
-                    </div>
-                    <CardTitle className="text-lg">Aptitude Assessment</CardTitle>
-                    <CardDescription>Evaluate your natural abilities</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                        <span>Logical reasoning</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                        <span>Mathematical skills</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                        <span>Verbal comprehension</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                        <span>Spatial awareness</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-gradient-to-br from-accent/10 to-accent/5 border-accent/20">
-                  <CardHeader className="pb-3">
-                    <div className="w-10 h-10 bg-gradient-accent rounded-lg flex items-center justify-center mb-2">
-                      <Award className="w-5 h-5 text-white" />
-                    </div>
-                    <CardTitle className="text-lg">Interest Profiling</CardTitle>
-                    <CardDescription>Discover what motivates you</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-1.5 h-1.5 bg-accent rounded-full" />
-                        <span>Subject preferences</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-1.5 h-1.5 bg-accent rounded-full" />
-                        <span>Activity types</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-1.5 h-1.5 bg-accent rounded-full" />
-                        <span>Work environments</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-1.5 h-1.5 bg-accent rounded-full" />
-                        <span>Career aspirations</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
+              {/* Quiz Section */}
+              <div className="grid grid-cols-1 gap-6">
                 <Card className="bg-gradient-to-br from-success/10 to-success/5 border-success/20">
                   <CardHeader className="pb-3">
                     <div className="w-10 h-10 bg-gradient-success rounded-lg flex items-center justify-center mb-2">
                       <CheckCircle className="w-5 h-5 text-white" />
                     </div>
                     <CardTitle className="text-lg">Personality Traits</CardTitle>
-                    <CardDescription>Understand your work style</CardDescription>
+                    <CardDescription>Explore your work style preferences</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2 text-sm">
@@ -158,11 +204,11 @@ const Quiz = () => {
               {/* Quiz Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div className="text-center p-4 bg-card/30 rounded-lg">
-                  <div className="text-2xl font-bold text-primary">120</div>
+                  <div className="text-2xl font-bold text-primary">15</div>
                   <div className="text-sm text-muted-foreground">Total Questions</div>
                 </div>
                 <div className="text-center p-4 bg-card/30 rounded-lg">
-                  <div className="text-2xl font-bold text-accent">45</div>
+                  <div className="text-2xl font-bold text-accent">12</div>
                   <div className="text-sm text-muted-foreground">Minutes</div>
                 </div>
                 <div className="text-center p-4 bg-card/30 rounded-lg">
@@ -175,34 +221,104 @@ const Quiz = () => {
                 </div>
               </div>
 
-              {/* Coming Soon Notice */}
-              <div className="text-center p-8 bg-gradient-to-br from-primary/5 via-accent/5 to-success/5 rounded-xl border border-primary/10">
-                <Play className="w-12 h-12 text-primary mx-auto mb-4 animate-float" />
-                <h3 className="text-xl font-bold font-space-grotesk mb-2">Interactive Quiz Coming Soon</h3>
-                <p className="text-muted-foreground mb-6">
-                  Our advanced ML algorithms are being fine-tuned to provide you with the most accurate career recommendations based on your responses.
-                </p>
-                
-                {/* Feature Timeline */}
-                <div className="space-y-4 mb-6">
-                  <div className="flex items-center justify-center space-x-4 p-3 bg-success/10 rounded-lg">
-                    <CheckCircle className="w-5 h-5 text-success" />
-                    <span className="text-sm">Question bank development - Complete</span>
-                  </div>
-                  <div className="flex items-center justify-center space-x-4 p-3 bg-warning/10 rounded-lg">
-                    <Clock className="w-5 h-5 text-warning" />
-                    <span className="text-sm">ML model training - In Progress</span>
-                  </div>
-                  <div className="flex items-center justify-center space-x-4 p-3 bg-muted/10 rounded-lg">
-                    <Target className="w-5 h-5 text-muted-foreground" />
-                    <span className="text-sm">User interface development - Planned</span>
+              {/* Quiz Interface */}
+              {!isStarted ? (
+                <div className="text-center p-8 bg-gradient-to-br from-primary/5 via-accent/5 to-success/5 rounded-xl border border-primary/10">
+                  <Play className="w-12 h-12 text-primary mx-auto mb-4 animate-float" />
+                  <h3 className="text-xl font-bold font-space-grotesk mb-2">Ready to Start Your Quiz?</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Begin the interactive career assessment to discover your ideal career path with personalized recommendations.
+                  </p>
+                  <Button
+                    className="bg-gradient-success hover:opacity-90"
+                    onClick={handleStartQuiz}
+                  >
+                    <Play className="w-5 h-5 mr-2" />
+                    Start Quiz
+                  </Button>
+                  <div className="mt-4">
+                    <Link to="/college-map">
+                      <Button variant="outline" className="w-full">
+                        <MapPin className="w-4 h-4 mr-2" />
+                        Explore Colleges Instead
+                      </Button>
+                    </Link>
                   </div>
                 </div>
+              ) : (
+                <div className="space-y-8">
+                  {/* Progress */}
+                  <Card className="glass-effect mb-8 animate-slide-up">
+                    <CardHeader>
+                      <div className="flex justify-between items-center mb-4">
+                        <CardTitle>Quiz Progress</CardTitle>
+                        <span className="text-sm text-muted-foreground">
+                          Step {currentStep + 1} of {quizSteps.length}
+                        </span>
+                      </div>
+                      <Progress value={100} className="mb-2" />
+                      <CardDescription>
+                        {quizSteps[currentStep].title} - {quizSteps[currentStep].description}
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
 
-                <Button className="bg-gradient-success hover:opacity-90">
-                  Get Notified When Ready
-                </Button>
-              </div>
+                  {/* Current Step */}
+                  <Card className="glass-effect mb-8 animate-slide-up">
+                    <CardHeader>
+                      <CardTitle className="text-2xl flex items-center">
+                        <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center mr-3">
+                          <span className="text-white font-bold">{currentStep + 1}</span>
+                        </div>
+                        {quizSteps[currentStep].title}
+                      </CardTitle>
+                      <CardDescription>
+                        {quizSteps[currentStep].description}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      {/* Question Interface */}
+                      <div className="p-6 bg-card/30 rounded-xl">
+                        <h3 className="font-semibold mb-4">Question {currentQuestionIndex + 1} of {questions.length}:</h3>
+                        <p className="mb-4">{questions[currentQuestionIndex].text}</p>
+                        <div className="space-y-3">
+                          {responseOptions.map((option) => (
+                            <Button
+                              key={option}
+                              variant={answers[questions[currentQuestionIndex].id] === option ? 'default' : 'outline'}
+                              className={`w-full h-auto py-2 px-4 text-left ${answers[questions[currentQuestionIndex].id] === option ? 'bg-gradient-primary' : ''
+                                }`}
+                              onClick={() => handleAnswer(questions[currentQuestionIndex].id, option)}
+                            >
+                              {option}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between">
+                        <Button
+                          variant="outline"
+                          disabled={isPreviousDisabled()}
+                          onClick={handlePrevious}
+                        >
+                          Previous
+                        </Button>
+                        {currentQuestionIndex === questions.length - 1 && (
+                          <Button
+                            onClick={handleCompleteQuiz}
+                            className="bg-gradient-primary hover:opacity-90"
+                            disabled={!answers[questions[currentQuestionIndex].id]}
+                          >
+                            Complete Quiz
+                            <CheckCircle className="w-4 h-4 ml-2" />
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -287,7 +403,7 @@ const Quiz = () => {
           </Card>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );

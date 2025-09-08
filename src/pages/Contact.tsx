@@ -3,21 +3,43 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Sparkles, Mail, Phone, MapPin, Clock, Send, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Sparkles, Mail, Phone, MapPin, Clock, Send, MessageCircle, CheckCircle } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
-import { useToast } from '@/hooks/use-toast';
+import { useForm, ValidationError } from '@formspree/react';
 
 const Contact = () => {
-  const { toast } = useToast();
+  const [state, handleSubmit] = useForm("mandaqwg");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast({
-      title: "Message Sent!",
-      description: "Thank you for contacting us. We'll get back to you within 24 hours.",
-    });
-  };
+  // Show green-themed success message on successful submission
+  if (state.succeeded) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="glass-effect max-w-md mx-auto border-green-500/50 bg-green-50/50 dark:bg-green-900/20">
+          <CardHeader>
+            <CardTitle className="text-2xl flex items-center text-green-600 dark:text-green-400">
+              <CheckCircle className="w-6 h-6 mr-2" />
+              Message Sent!
+            </CardTitle>
+            <CardDescription className="text-green-500 dark:text-green-300">
+              Thank you for contacting us. We'll get back to you soon.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link to="/dashboard">
+              <Button
+                variant="outline"
+                className="w-full border-green-500 text-green-600 hover:bg-green-100 dark:text-green-400 dark:hover:bg-green-900/30"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Dashboard
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -76,40 +98,115 @@ const Contact = () => {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium mb-2 block">First Name</label>
-                    <Input placeholder="Enter your first name" required />
+                    <label htmlFor="firstName" className="text-sm font-medium mb-2 block">
+                      First Name
+                    </label>
+                    <Input
+                      id="firstName"
+                      name="firstName"
+                      placeholder="Enter your first name"
+                      required
+                    />
+                    <ValidationError
+                      prefix="First Name"
+                      field="firstName"
+                      errors={state.errors}
+                    />
                   </div>
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Last Name</label>
-                    <Input placeholder="Enter your last name" required />
+                    <label htmlFor="lastName" className="text-sm font-medium mb-2 block">
+                      Last Name
+                    </label>
+                    <Input
+                      id="lastName"
+                      name="lastName"
+                      placeholder="Enter your last name"
+                      required
+                    />
+                    <ValidationError
+                      prefix="Last Name"
+                      field="lastName"
+                      errors={state.errors}
+                    />
                   </div>
                 </div>
-                
+
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Email</label>
-                  <Input type="email" placeholder="Enter your email address" required />
+                  <label htmlFor="email" className="text-sm font-medium mb-2 block">
+                    Email
+                  </label>
+                  <Input
+                    id="email"
+                    type="email"
+                    name="email"
+                    placeholder="Enter your email address"
+                    required
+                  />
+                  <ValidationError
+                    prefix="Email"
+                    field="email"
+                    errors={state.errors}
+                  />
                 </div>
-                
+
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Phone Number</label>
-                  <Input type="tel" placeholder="Enter your phone number" />
+                  <label htmlFor="phone" className="text-sm font-medium mb-2 block">
+                    Phone Number
+                  </label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    name="phone"
+                    placeholder="Enter your phone number"
+                  />
+                  <ValidationError
+                    prefix="Phone"
+                    field="phone"
+                    errors={state.errors}
+                  />
                 </div>
-                
+
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Subject</label>
-                  <Input placeholder="What is this regarding?" required />
+                  <label htmlFor="subject" className="text-sm font-medium mb-2 block">
+                    Subject
+                  </label>
+                  <Input
+                    id="subject"
+                    name="subject"
+                    placeholder="What is this regarding?"
+                    required
+                  />
+                  <ValidationError
+                    prefix="Subject"
+                    field="subject"
+                    errors={state.errors}
+                  />
                 </div>
-                
+
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Message</label>
-                  <Textarea 
+                  <label htmlFor="message" className="text-sm font-medium mb-2 block">
+                    Message
+                  </label>
+                  <Textarea
+                    id="message"
+                    name="message"
                     placeholder="Tell us more about how we can help you..."
                     rows={5}
                     required
                   />
+                  <ValidationError
+                    prefix="Message"
+                    field="message"
+                    errors={state.errors}
+                  />
                 </div>
-                
-                <Button type="submit" size="lg" className="w-full bg-gradient-primary hover:opacity-90">
+
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="w-full bg-gradient-primary hover:opacity-90"
+                  disabled={state.submitting}
+                >
                   <Send className="w-4 h-4 mr-2" />
                   Send Message
                 </Button>
@@ -137,7 +234,7 @@ const Contact = () => {
                     <p className="text-muted-foreground">support@lakshya.edu</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 bg-gradient-accent rounded-xl flex items-center justify-center">
                     <Phone className="w-6 h-6 text-white" />
@@ -147,7 +244,7 @@ const Contact = () => {
                     <p className="text-muted-foreground">+91 98765 43210</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 bg-gradient-success rounded-xl flex items-center justify-center">
                     <MapPin className="w-6 h-6 text-white" />
@@ -160,7 +257,7 @@ const Contact = () => {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-warning to-warning-glow rounded-xl flex items-center justify-center">
                     <Clock className="w-6 h-6 text-white" />
@@ -188,14 +285,14 @@ const Contact = () => {
                     Our AI algorithms have a 95% accuracy rate based on extensive testing with thousands of students.
                   </p>
                 </div>
-                
+
                 <div>
                   <h4 className="font-semibold mb-2">Is Lakshya free to use?</h4>
                   <p className="text-sm text-muted-foreground">
                     Yes! Our basic features are completely free. Premium features are available for advanced guidance.
                   </p>
                 </div>
-                
+
                 <div>
                   <h4 className="font-semibold mb-2">How long does the assessment take?</h4>
                   <p className="text-sm text-muted-foreground">

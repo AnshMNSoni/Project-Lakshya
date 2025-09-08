@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Sparkles, Target, Users, Zap, Heart, Award, BookOpen } from 'lucide-react';
+import { ArrowLeft, Sparkles, Target, Users, Zap, Heart, Award, BookOpen, MapPin, Brain } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
@@ -42,8 +42,7 @@ const About = () => {
             About <span className="gradient-text">Lakshya</span>
           </h1>
           <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4">
-            Empowering Indian students to discover their true potential through AI-powered 
-            career guidance and personalized educational pathways.
+            Empowering Indian students with AI-powered career guidance and personalized education paths.
           </p>
         </div>
 
@@ -60,9 +59,14 @@ const About = () => {
             </CardHeader>
             <CardContent>
               <CardDescription className="text-base leading-relaxed">
-                To democratize quality career guidance and make it accessible to every Indian student, 
-                regardless of their background. We believe every student deserves the opportunity to 
-                discover their strengths and pursue their dreams with confidence.
+                Empower Indian students with AI-driven career guidance.
+                <ul className="list-disc pl-5 mt-4 space-y-2">
+                  <li>Accessible career guidance</li>
+                  <li>AI analysis (Naive Bayes, Gemini API)</li>
+                  <li>Tailored educational pathways</li>
+                  <li>Flexible field selection</li>
+                  <li>Nearby college connections</li>
+                </ul>
               </CardDescription>
             </CardContent>
           </Card>
@@ -78,12 +82,27 @@ const About = () => {
             </CardHeader>
             <CardContent>
               <CardDescription className="text-base leading-relaxed">
-                To create a future where every student in India has access to personalized, 
-                data-driven career guidance that helps them make informed decisions about their 
-                education and career paths, leading to a more skilled and fulfilled workforce.
+                Data-driven career guidance for fulfilling careers.
+                <ul className="list-disc pl-5 mt-4 space-y-2">
+                  <li>Inclusive platform</li>
+                  <li>Precise AI recommendations</li>
+                  <li>Flexible career options</li>
+                  <li>Tailored educational resources</li>
+                  <li>Localized college support</li>
+                </ul>
               </CardDescription>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Image Section */}
+        <div className="mb-16 max-w-2xl mx-auto flex justify-center">
+          <img
+            src="about_flow.png"
+            alt="Students exploring career paths with Lakshya"
+            className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-2xl h-auto rounded-2xl shadow-lg object-cover transition-all duration-300"
+            style={{ objectFit: 'cover', objectPosition: 'center' }}
+          />
         </div>
 
         {/* Key Features */}
@@ -101,7 +120,7 @@ const About = () => {
               </CardHeader>
               <CardContent>
                 <CardDescription>
-                  Advanced machine learning algorithms analyze your aptitude, interests, 
+                  Advanced machine learning algorithms, including Naive Bayes and Gemini API, analyze your aptitude, interests,
                   and personality to provide accurate career recommendations.
                 </CardDescription>
               </CardContent>
@@ -116,8 +135,8 @@ const About = () => {
               </CardHeader>
               <CardContent>
                 <CardDescription>
-                  Access information about thousands of government colleges, courses, 
-                  and career paths across India, all in one platform.
+                  Access information about thousands of government colleges, courses,
+                  and career paths across India, including admission procedures and scholarships.
                 </CardDescription>
               </CardContent>
             </Card>
@@ -125,14 +144,13 @@ const About = () => {
             <Card className="glass-effect hover:shadow-card transition-all duration-300 text-center animate-slide-up">
               <CardHeader>
                 <div className="w-16 h-16 bg-gradient-to-br from-warning to-warning-glow rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Heart className="w-8 h-8 text-white" />
+                  <MapPin className="w-8 h-8 text-white" />
                 </div>
-                <CardTitle>Student-Centric</CardTitle>
+                <CardTitle>Localized Guidance</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription>
-                  Designed specifically for Indian students, understanding local 
-                  educational systems, cultural contexts, and career opportunities.
+                  Find nearby colleges and universities with detailed information on admissions, scholarships, and alumni networks, tailored to your location and career choices.
                 </CardDescription>
               </CardContent>
             </Card>
@@ -181,10 +199,10 @@ const About = () => {
               </p>
             </div>
             <div className="p-6 bg-card/30 rounded-xl animate-slide-up">
-              <Heart className="w-12 h-12 text-success mx-auto mb-4" />
-              <h3 className="font-semibold mb-2">Empathy</h3>
+              <Brain className="w-12 h-12 text-success mx-auto mb-4" />
+              <h3 className="font-semibold mb-2">Personalization</h3>
               <p className="text-sm text-muted-foreground">
-                Understanding and addressing the unique challenges faced by Indian students.
+                Tailoring career paths to individual strengths, interests, and aspirations.
               </p>
             </div>
           </div>
@@ -194,7 +212,7 @@ const About = () => {
         <div className="text-center animate-slide-up">
           <h2 className="text-2xl font-bold mb-4">Ready to Discover Your Lakshya?</h2>
           <p className="text-muted-foreground mb-6">
-            Join thousands of students who have already found their path to success.
+            Join thousands of students who have found their path to success.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/dashboard">
