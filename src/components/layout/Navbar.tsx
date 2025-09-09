@@ -12,6 +12,7 @@ import { Sparkles, User, LogOut, Settings, Menu, X } from 'lucide-react';
 import { AnimatedThemeToggler } from '@/magicui/animated-theme-toggler';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useState } from 'react';
+import { SmoothCursor } from '@/components/magicui/smooth-cursor';
 
 interface NavbarProps {
   isAuthenticated?: boolean;
@@ -51,6 +52,7 @@ const Navbar = ({ isAuthenticated = false }: NavbarProps) => {
 
   return (
     <header className="glass-effect border-b border-border/50 sticky top-0 z-50 backdrop-blur-xl">
+      {/* <SmoothCursor /> */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Theme Toggle */}

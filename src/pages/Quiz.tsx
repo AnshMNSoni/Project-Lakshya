@@ -17,59 +17,105 @@ const Quiz = () => {
   const [questions, setQuestions] = useState([]);
 
   const quizSteps = [
-    { title: 'Personality Analysis', description: 'Understand your work style and preferences', duration: '12 min' }
+    { title: 'Personality Analysis', description: 'Understand your work style and preferences', duration: '12 min' },
+    { title: 'Physical Appearance Analysis', description: 'Assess your physical traits and characteristics', duration: '15 min' },
   ];
 
   const personalityQuestions = {
     Extraversion: [
       'I enjoy being the center of attention.',
       'I feel energized when I spend time with many people.',
-      'I like to start conversations.'
+      'I like to start conversations.',
     ],
     Neuroticism: [
       'I often feel anxious or tense.',
       'I get upset easily.',
-      'I worry about many different things.'
+      'I worry about many different things.',
     ],
     Agreeableness: [
       'I sympathize with others’ feelings.',
       'I am interested in other people’s problems.',
-      'I take time out for others.'
+      'I take time out for others.',
     ],
     Conscientiousness: [
       'I like to plan everything in detail.',
       'I follow through on commitments.',
-      'I pay attention to details.'
+      'I pay attention to details.',
     ],
     Openness: [
       'I enjoy trying new activities.',
       'I like to think about abstract ideas.',
-      'I have a vivid imagination.'
-    ]
+      'I have a vivid imagination.',
+    ],
   };
+
+  const physicalAppearanceQuestions = [
+    'My body frame is Thin and Lean.',
+    'My body frame is Medium.',
+    'My body frame is Well Built.',
+    'My hair is Dry and with Split Ends.',
+    'My hair is Normal, Thin, More Hair Fall.',
+    'My hair is Greasy, Heavy.',
+    'My hair color is Pale Brown.',
+    'My hair color is Red or Brown.',
+    'My hair color is Jet Black.',
+    'My skin is Dry, Rough.',
+    'My skin is Soft, More Sweating, Acne.',
+    'My skin is Moist, Greasy.',
+    'My complexion is Dark, Blackish.',
+    'My complexion is Pink to Red.',
+    'My complexion is Glowing, White.',
+    'My body weight is Low, Difficult to Put on Weight.',
+    'My body weight is Medium, Can Easily Lose or Gain Weight.',
+    'My body weight is Overweight, Difficult to Lose Weight.',
+    'My nails are Blackish, Small, Brittle.',
+    'My nails are Reddish, Small.',
+    'My nails are Pinkish, Big, Smooth.',
+    'My teeth are Very Big or Very Small, Irregular, Blackish.',
+    'My teeth are Medium Sized, Yellowish.',
+    'My teeth are Large, Shining White.',
+    'My pace of performing work is Fast, Always in Hurry.',
+    'My pace of performing work is Medium, Energetic.',
+    'My pace of performing work is Slow, Steady.',
+    'My mental activity is Quick, Restless.',
+    'My mental activity is Smart Intellect, Aggressive.',
+    'My mental activity is Calm, Stable.',
+  ];
 
   const responseOptions = [
     'Disagree',
     'Slightly Disagree',
     'Neutral',
     'Slightly Agree',
-    'Agree'
+    'Agree',
   ];
 
-  // Generate questions for the Personality Analysis step
+  // Generate questions for all steps
   const getQuestionsForStep = () => {
-    return Object.entries(personalityQuestions).flatMap(([trait, questions]) =>
-      questions.map((q, index) => ({
-        id: `${trait}-${index}`,
+    const allQuestions = [
+      ...Object.entries(personalityQuestions).flatMap(([trait, questions]) =>
+        questions.map((q, index) => ({
+          id: `${trait}-${index}`,
+          text: q,
+          trait,
+          step: 0, // Personality Analysis step
+        }))
+      ),
+      ...physicalAppearanceQuestions.map((q, index) => ({
+        id: `Physical-${index}`,
         text: q,
-        trait
-      }))
-    );
+        category: 'PhysicalAppearance',
+        step: 1, // Physical Appearance Analysis step
+      })),
+    ];
+    return allQuestions;
   };
 
-  // Update questions only when the step changes
+  // Update questions based on current step
   useEffect(() => {
-    setQuestions(getQuestionsForStep());
+    const stepQuestions = getQuestionsForStep().filter(q => q.step === currentStep);
+    setQuestions(stepQuestions);
+    setCurrentQuestionIndex(0); // Reset index when step changes
   }, [currentStep]);
 
   const handleStartQuiz = () => {
@@ -83,12 +129,15 @@ const Quiz = () => {
   const handleAnswer = (questionId, answer) => {
     setAnswers((prev) => ({
       ...prev,
-      [questionId]: answer
+      [questionId]: answer,
     }));
 
-    // Only move to the next question if not on the last question
-    if (currentQuestionIndex < questions.length - 1) {
+    // Move to next question within the current step
+    const currentStepQuestions = questions.length;
+    if (currentQuestionIndex < currentStepQuestions - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
+    } else if (currentStep < quizSteps.length - 1) {
+      setCurrentStep(currentStep + 1);
     }
   };
 
@@ -105,13 +154,25 @@ const Quiz = () => {
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
+    } else if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+      const prevStepQuestions = getQuestionsForStep().filter(q => q.step === currentStep - 1);
+      setQuestions(prevStepQuestions);
+      setCurrentQuestionIndex(prevStepQuestions.length - 1);
     }
   };
 
   // Determine if the Previous button should be disabled
   const isPreviousDisabled = () => {
-    return currentQuestionIndex === 0 || currentQuestionIndex === questions.length - 1;
+    return currentStep === 0 && currentQuestionIndex === 0;
   };
+
+  // Calculate progress based on total questions across all steps
+  const totalQuestions = getQuestionsForStep().length;
+  const currentQuestionNumber = getQuestionsForStep()
+    .slice(0, currentStep * questions.length + currentQuestionIndex + 1)
+    .length;
+  const progress = (currentQuestionNumber / totalQuestions) * 100;
 
   return (
     <div className="min-h-screen bg-background">
@@ -150,7 +211,7 @@ const Quiz = () => {
             <h2 className="text-3xl font-bold font-space-grotesk mb-4">
               Interactive Career Assessment
               <span className="block text-lg text-muted-foreground font-normal mt-2">
-                Comprehensive questionnaire powered by machine learning
+                This assessment consists of 2 phases: Personality Analysis and Physical Appearance Analysis, powered by machine learning
               </span>
             </h2>
           </div>
@@ -160,15 +221,14 @@ const Quiz = () => {
             <div className="absolute inset-0 bg-gradient-to-br from-success/5 via-primary/5 to-accent/5" />
             <CardHeader className="relative z-10">
               <CardTitle className="text-2xl font-space-grotesk text-center">
-                Comprehensive Assessment Suite
+                Comprehensive Assessment Suite (2 Phases)
               </CardTitle>
               <CardDescription className="text-center text-base">
-                Multi-dimensional evaluation to discover your ideal career path
+                This evaluation consists of 2 phases: Personality Analysis and Physical Appearance Analysis to discover your ideal career path
               </CardDescription>
             </CardHeader>
             <CardContent className="relative z-10 space-y-8">
               {/* Quiz Sections */}
-              {/* Quiz Section */}
               <div className="grid grid-cols-1 gap-6">
                 <Card className="bg-gradient-to-br from-success/10 to-success/5 border-success/20">
                   <CardHeader className="pb-3">
@@ -199,16 +259,41 @@ const Quiz = () => {
                     </div>
                   </CardContent>
                 </Card>
+                <Card className="bg-gradient-to-br from-success/10 to-success/5 border-success/20">
+                  <CardHeader className="pb-3">
+                    <div className="w-10 h-10 bg-gradient-success rounded-lg flex items-center justify-center mb-2">
+                      <CheckCircle className="w-5 h-5 text-white" />
+                    </div>
+                    <CardTitle className="text-lg">Physical Appearance</CardTitle>
+                    <CardDescription>Evaluate your physical characteristics</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-1.5 h-1.5 bg-success rounded-full" />
+                        <span>Body frame and weight</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-1.5 h-1.5 bg-success rounded-full" />
+                        <span>Hair and skin type</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-1.5 h-1.5 bg-success rounded-full" />
+                        <span>Physical activity levels</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
 
               {/* Quiz Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div className="text-center p-4 bg-card/30 rounded-lg">
-                  <div className="text-2xl font-bold text-primary">15</div>
+                  <div className="text-2xl font-bold text-primary">45</div>
                   <div className="text-sm text-muted-foreground">Total Questions</div>
                 </div>
                 <div className="text-center p-4 bg-card/30 rounded-lg">
-                  <div className="text-2xl font-bold text-accent">12</div>
+                  <div className="text-2xl font-bold text-accent">27</div>
                   <div className="text-sm text-muted-foreground">Minutes</div>
                 </div>
                 <div className="text-center p-4 bg-card/30 rounded-lg">
@@ -256,7 +341,7 @@ const Quiz = () => {
                           Step {currentStep + 1} of {quizSteps.length}
                         </span>
                       </div>
-                      <Progress value={100} className="mb-2" />
+                      <Progress value={progress} className="mb-2" />
                       <CardDescription>
                         {quizSteps[currentStep].title} - {quizSteps[currentStep].description}
                       </CardDescription>
@@ -286,8 +371,7 @@ const Quiz = () => {
                             <Button
                               key={option}
                               variant={answers[questions[currentQuestionIndex].id] === option ? 'default' : 'outline'}
-                              className={`w-full h-auto py-2 px-4 text-left ${answers[questions[currentQuestionIndex].id] === option ? 'bg-gradient-primary' : ''
-                                }`}
+                              className={`w-full h-auto py-2 px-4 text-left ${answers[questions[currentQuestionIndex].id] === option ? 'bg-gradient-primary' : ''}`}
                               onClick={() => handleAnswer(questions[currentQuestionIndex].id, option)}
                             >
                               {option}
@@ -304,7 +388,7 @@ const Quiz = () => {
                         >
                           Previous
                         </Button>
-                        {currentQuestionIndex === questions.length - 1 && (
+                        {currentStep === quizSteps.length - 1 && currentQuestionIndex === questions.length - 1 && (
                           <Button
                             onClick={handleCompleteQuiz}
                             className="bg-gradient-primary hover:opacity-90"

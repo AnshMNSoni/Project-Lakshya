@@ -1,39 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
 
 /* Futuristic EdTech Design System */
 @layer base {
   :root {
-    /* Light mode colors */
+    /* Light mode colors - Professional white base */
     --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --foreground: 0 0% 5%;
 
-    /* Card system */
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --card-hover: 240 4.8% 95.9%;
+    /* Card system - Clean whites with subtle shadows */
+    --card: 0 0% 99%;
+    --card-foreground: 0 0% 5%;
+    --card-hover: 0 0% 97%;
 
-    /* Brand colors - EdTech futuristic theme */
-    --primary: 263 70% 50%;
-    --primary-glow: 263 85% 65%;
+    /* Brand colors - Professional Orange Primary */
+    --primary: 24 100% 50%;
+    --primary-glow: 24 100% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 12%;
+    --secondary: 0 0% 15%;
     --secondary-foreground: 0 0% 98%;
 
-    /* Accent colors */
-    --accent: 195 100% 50%;
-    --accent-glow: 195 100% 70%;
-    --accent-foreground: 240 10% 3.9%;
+    /* Success - Professional Green */
+    --success: 142 71% 45%;
+    --success-glow: 142 71% 55%;
+    --success-foreground: 0 0% 100%;
 
-    --success: 142 76% 36%;
-    --success-glow: 142 76% 56%;
+    /* Accent - Vibrant Orange complement */
+    --accent: 30 100% 55%;
+    --accent-glow: 30 100% 65%;
+    --accent-foreground: 0 0% 100%;
 
-    --warning: 38 92% 50%;
-    --warning-glow: 38 92% 70%;
+    /* Warning - Golden Orange */
+    --warning: 45 93% 58%;
+    --warning-glow: 45 93% 68%;
+    --warning-foreground: 0 0% 5%;
 
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
@@ -51,12 +57,13 @@
 
     --radius: 0.75rem;
 
-    /* Gradients */
+    /* Professional Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
     --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--accent-glow)));
     --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(var(--success-glow)));
-    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 50%, hsl(var(--success)) 100%);
     --gradient-card: linear-gradient(145deg, hsl(var(--card)) 0%, hsl(var(--card-hover)) 100%);
+    --gradient-professional: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(30 100% 60%) 100%);
 
     /* Shadows */
     --shadow-glow: 0 0 40px hsl(var(--primary) / 0.3);
@@ -70,33 +77,37 @@
   }
 
   .dark {
-    /* Dark mode colors */
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
+    /* Dark mode colors - Professional dark with warm accents */
+    --background: 0 0% 8%;
+    --foreground: 0 0% 95%;
 
-    /* Card system */
-    --card: 240 10% 5.9%;
-    --card-foreground: 0 0% 98%;
-    --card-hover: 240 8% 8%;
+    /* Card system - Dark professional */
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 95%;
+    --card-hover: 0 0% 12%;
 
-    /* Brand colors - EdTech futuristic theme */
-    --primary: 263 70% 50%;
-    --primary-glow: 263 85% 65%;
-    --primary-foreground: 0 0% 100%;
+    /* Brand colors - Warm orange for dark mode */
+    --primary: 24 100% 55%;
+    --primary-glow: 24 100% 65%;
+    --primary-foreground: 0 0% 5%;
 
-    --secondary: 210 40% 12%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 0 0% 20%;
+    --secondary-foreground: 0 0% 95%;
 
-    /* Accent colors */
-    --accent: 195 100% 50%;
-    --accent-glow: 195 100% 70%;
-    --accent-foreground: 240 10% 3.9%;
+    /* Success - Bright green for dark mode */
+    --success: 142 71% 50%;
+    --success-glow: 142 71% 60%;
+    --success-foreground: 0 0% 5%;
 
-    --success: 142 76% 36%;
-    --success-glow: 142 76% 56%;
+    /* Accent - Bright orange accent */
+    --accent: 30 100% 60%;
+    --accent-glow: 30 100% 70%;
+    --accent-foreground: 0 0% 5%;
 
-    --warning: 38 92% 50%;
-    --warning-glow: 38 92% 70%;
+    /* Warning - Golden for dark mode */
+    --warning: 45 93% 63%;
+    --warning-glow: 45 93% 73%;
+    --warning-foreground: 0 0% 5%;
 
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;

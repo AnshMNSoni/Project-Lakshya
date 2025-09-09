@@ -18,7 +18,10 @@ import {
   Calendar,
   Menu,
   X,
-  Lock
+  Lock,
+  ClipboardList,
+  Lightbulb,
+  CheckCircle
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Footer from '@/components/layout/Footer';
@@ -27,6 +30,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { Timeline } from '@/components/ui/timeline';
 
 const Dashboard = () => {
   const { toast } = useToast();
@@ -77,6 +81,160 @@ const Dashboard = () => {
     });
   };
 
+  // Timeline data for the journey visualization
+  const timelineData = [
+    {
+      title: "User Profile",
+      content: (
+        <div>
+          <p className="mb-6 text-sm font-normal text-foreground md:text-base dark:text-foreground">
+            Start your journey by creating a comprehensive profile with your academic background, interests, and career aspirations.
+          </p>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 text-sm text-muted-foreground md:text-base dark:text-muted-foreground">
+              <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
+                <User className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+              </div>
+              Personal Information Setup
+            </div>
+            <div className="flex items-center gap-3 text-sm text-muted-foreground md:text-base dark:text-muted-foreground">
+              <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
+                <BookOpen className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+              </div>
+              Academic Background Entry
+            </div>
+            <div className="flex items-center gap-3 text-sm text-muted-foreground md:text-base dark:text-muted-foreground">
+              <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
+                <Target className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+              </div>
+              Career Goals Definition
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Smart Analysis",
+      content: (
+        <div>
+          <p className="mb-6 text-sm font-normal text-foreground md:text-base dark:text-foreground">
+            Our AI-powered system analyzes your profile, preferences, and performance to understand your strengths and potential career paths.
+          </p>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 text-sm text-muted-foreground md:text-base dark:text-muted-foreground">
+              <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
+                <Brain className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+              </div>
+              AI-Powered Assessment
+            </div>
+            <div className="flex items-center gap-3 text-sm text-muted-foreground md:text-base dark:text-muted-foreground">
+              <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
+                <ClipboardList className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+              </div>
+              Skills & Interest Evaluation
+            </div>
+            <div className="flex items-center gap-3 text-sm text-muted-foreground md:text-base dark:text-muted-foreground">
+              <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+              </div>
+              Performance Analytics
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Personalized Recommendations",
+      content: (
+        <div>
+          <p className="mb-6 text-sm font-normal text-foreground md:text-base dark:text-foreground">
+            Receive curated college and course recommendations tailored to your profile, ensuring the best fit for your academic and career goals.
+          </p>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 text-sm text-muted-foreground md:text-base dark:text-muted-foreground">
+              <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
+                <Lightbulb className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+              </div>
+              Smart Course Matching
+            </div>
+            <div className="flex items-center gap-3 text-sm text-muted-foreground md:text-base dark:text-muted-foreground">
+              <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
+                <Award className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+              </div>
+              College Rankings & Insights
+            </div>
+            <div className="flex items-center gap-3 text-sm text-muted-foreground md:text-base dark:text-muted-foreground">
+              <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+              </div>
+              Personalized Career Paths
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "College Mapping",
+      content: (
+        <div>
+          <p className="mb-6 text-sm font-normal text-foreground md:text-base dark:text-foreground">
+            Explore colleges on an interactive map, view detailed information, and compare institutions based on your priorities and preferences.
+          </p>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 text-sm text-muted-foreground md:text-base dark:text-muted-foreground">
+              <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
+                <MapPin className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+              </div>
+              Interactive College Map
+            </div>
+            <div className="flex items-center gap-3 text-sm text-muted-foreground md:text-base dark:text-muted-foreground">
+              <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
+                <BookOpen className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+              </div>
+              Detailed College Profiles
+            </div>
+            <div className="flex items-center gap-3 text-sm text-muted-foreground md:text-base dark:text-muted-foreground">
+              <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
+                <Calendar className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+              </div>
+              Application Deadlines
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Final Decision",
+      content: (
+        <div>
+          <p className="mb-6 text-sm font-normal text-foreground md:text-base dark:text-foreground">
+            Make informed decisions with comprehensive data, peer reviews, and expert guidance to choose the perfect college for your future.
+          </p>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 text-sm text-muted-foreground md:text-base dark:text-muted-foreground">
+              <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
+                <CheckCircle className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+              </div>
+              Informed Decision Making
+            </div>
+            <div className="flex items-center gap-3 text-sm text-muted-foreground md:text-base dark:text-muted-foreground">
+              <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
+                <User className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+              </div>
+              Peer Reviews & Ratings
+            </div>
+            <div className="flex items-center gap-3 text-sm text-muted-foreground md:text-base dark:text-muted-foreground">
+              <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
+                <Clock className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+              </div>
+              Application Timeline
+            </div>
+          </div>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -126,7 +284,8 @@ const Dashboard = () => {
                       <Menu className="w-5 h-5" />
                     </Button>
                   </SheetTrigger>
-                  <SheetContent side="right" className="w-[300px] glass-effect border-border/20 backdrop-blur-xl">
+                  <SheetContent side="right"className="w-[300px] bg-white dark:bg-neutral-900 border-border/20">
+
                     <div className="flex flex-col h-full">
                       {/* Header */}
                       <div className="py-6 border-b border-border/20">
@@ -366,13 +525,11 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        {/* Image Section */}
-        <div className="mb-6 sm:mb-8 animate-slide-up flex justify-center">
-          <img
-            src="dashboard_flow.png" // replace with your image path
-            alt="Dashboard Illustration"
-            className="rounded-xl shadow-lg w-full max-w-3xl object-cover"
-          />
+        {/* Timeline Section */}
+        <div className="mb-6 sm:mb-8 animate-slide-up">
+          <div className="relative w-full overflow-clip">
+            <Timeline data={timelineData} />
+          </div>
         </div>
 
 

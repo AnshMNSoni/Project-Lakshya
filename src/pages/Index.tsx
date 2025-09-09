@@ -2,34 +2,35 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sparkles, User, Brain, BookOpen, MapPin, Target, Users, TrendingUp, Award, ArrowRight, CheckCircle } from 'lucide-react';
 import heroImage from '@/assets/hero-education.jpg';
-import Navbar from '@/components/layout/Navbar';
+import ProfessionalNavbar from '@/components/layout/ProfessionalNavbar';
+import { SmoothCursor } from '@/components/magicui/smooth-cursor';
 import Footer from '@/components/layout/Footer';
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Navbar />
+    <div className="min-h-screen bg-background flex flex-col relative">
+      <ProfessionalNavbar />
       
       {/* Hero Section */}
       <main className="relative overflow-hidden flex-1">
-        <div className="absolute inset-0">
+        {/* <div className="absolute inset-0">
           <img
             src={heroImage}
             alt="Lakshya - Smart Career Guidance Platform"
             className="w-full h-full object-cover opacity-20"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-background/80 to-background/90" />
-        </div>
+        </div> */}
         
         <div className="relative z-10 flex items-center justify-center min-h-[80vh] pt-16">
           <div className="text-center max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 animate-slide-up">
-            <div className="w-32 h-32 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-8 animate-glow">
-              <Sparkles className="w-16 h-16 text-white" />
+            <div className="w-32 h-32 bg-gradient-professional rounded-full flex items-center justify-center mx-auto mb-8 animate-glow shadow-2xl">
+              <Sparkles className="w-16 h-16 text-white drop-shadow-lg" />
             </div>
             
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-space-grotesk mb-6 leading-tight">
               Discover Your{' '}
-              <span className="gradient-text">Lakshya</span>
+              <span className="bg-gradient-professional bg-clip-text text-transparent">Lakshya</span>
               <br />
               <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-muted-foreground">with Smart AI Guidance</span>
             </h1>
@@ -41,13 +42,13 @@ const Index = () => {
             
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center mb-20 px-4">
               <Link to="/sign-up" className="w-full sm:w-auto">
-                <Button size="lg" className="bg-gradient-primary hover:opacity-90 text-base sm:text-lg px-8 sm:px-12 py-4 sm:py-6 h-auto w-full sm:w-auto">
+                <Button size="lg" className="bg-gradient-professional hover:opacity-90 text-base sm:text-lg px-8 sm:px-12 py-4 sm:py-6 h-auto w-full sm:w-auto shadow-lg hover:shadow-xl transition-shadow">
                   Start Your Journey
                   <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5 ml-2" />
                 </Button>
               </Link>
               <Link to="/sign-in" className="w-full sm:w-auto">
-                <Button size="lg" variant="outline" className="text-base sm:text-lg px-8 sm:px-12 py-4 sm:py-6 h-auto glass-effect border-primary/20 w-full sm:w-auto">
+                <Button size="lg" variant="outline" className="text-base sm:text-lg px-8 sm:px-12 py-4 sm:py-6 h-auto glass-effect border-primary/30 hover:border-primary/50 w-full sm:w-auto">
                   I Have an Account
                 </Button>
               </Link>

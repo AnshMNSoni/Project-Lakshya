@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ArrowLeft, Sparkles, Brain, TrendingUp, Target, Zap, Play } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 import { AnimatedThemeToggler } from '@/magicui/animated-theme-toggler';
+import { LakshyaBreadcrumb } from '@/components/common/LakshyaBreadcrumb';
 
 const SmartAnalysis = () => {
   const analysisSteps = [
@@ -43,6 +44,9 @@ const SmartAnalysis = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Breadcrumb */}
+        <LakshyaBreadcrumb />
+        
         {/* Hero Section */}
         <div className="text-center mb-12 sm:mb-16 animate-slide-up">
           <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-primary rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6">

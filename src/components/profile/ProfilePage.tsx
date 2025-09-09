@@ -267,7 +267,7 @@ const ProfilePage = () => {
                     type="email"
                     value={profileData.email}
                     disabled={true}
-                    className="bg-muted/50 border-border/50 text-muted-foreground"
+                    className="bg-card/50 border-border/50 focus:border-primary transition-colors"
                   />
                   <p className="text-xs text-muted-foreground">Email cannot be changed</p>
                 </div>

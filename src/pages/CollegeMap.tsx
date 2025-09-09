@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, MapPin, Navigation, Search, Filter, Globe, Bot } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
+import { CollegeBreadcrumbWithDropdown } from '@/components/common/LakshyaBreadcrumb';
 
 const CollegeMap = () => {
   const navigate = useNavigate();
@@ -37,6 +38,9 @@ const CollegeMap = () => {
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
+          {/* Breadcrumb */}
+          <CollegeBreadcrumbWithDropdown />
+          
           {/* Hero Section */}
           <div className="text-center animate-slide-up">
             <div className="w-24 h-24 bg-gradient-success rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse-glow">
