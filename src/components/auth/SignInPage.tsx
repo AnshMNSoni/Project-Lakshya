@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import heroImage from '@/assets/hero-education.jpg';
 import ProfessionalNavbar from '@/components/layout/ProfessionalNavbar';
-import { SmoothCursor } from '@/components/magicui/smooth-cursor';
+
 
 const SignInPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -103,7 +103,7 @@ const SignInPage = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col relative">
-      <SmoothCursor />
+    
       <ProfessionalNavbar hideAuthOptions={true} />
       <main className="flex-1">
         <div className="min-h-[calc(100vh-64px)] flex">

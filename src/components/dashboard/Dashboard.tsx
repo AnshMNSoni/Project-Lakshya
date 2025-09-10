@@ -21,7 +21,8 @@ import {
   Lock,
   ClipboardList,
   Lightbulb,
-  CheckCircle
+  CheckCircle,
+  ArrowRight
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Footer from '@/components/layout/Footer';
@@ -533,86 +534,118 @@ const Dashboard = () => {
         </div>
 
 
-        {/* Main Features Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+        {/* Main Features Grid - Enhanced Design */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
           {/* Left Column */}
           <div className="space-y-6">
-            {/* Profile Card - Always shown */}
-            <Card className="glass-effect hover:shadow-card transition-all duration-300 animate-slide-up">
-              <CardHeader>
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center">
-                    <User className="w-6 h-6 text-white" />
+            {/* Profile Card - Always shown with enhanced design */}
+            <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-500 animate-slide-up bg-gradient-to-br from-white via-white to-orange-50 dark:from-background dark:via-background dark:to-orange-950/20 border-2 border-orange-200/50 dark:border-orange-800/20">
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-transparent to-green-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <CardHeader className="relative z-10">
+                <div className="flex items-center space-x-4">
+                  <div className="relative">
+                    <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
+                      <User className="w-7 h-7 text-white" />
+                    </div>
+                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">1</span>
+                    </div>
                   </div>
-                  <div>
-                    <CardTitle className="text-xl">Profile Management</CardTitle>
-                    <CardDescription>Update your personal information and preferences</CardDescription>
+                  <div className="flex-1">
+                    <CardTitle className="text-xl font-bold bg-gradient-to-r from-gray-900 to-orange-600 bg-clip-text text-transparent dark:from-white dark:to-orange-400">
+                      Profile Management
+                    </CardTitle>
+                    <CardDescription className="text-gray-600 dark:text-gray-300 mt-1">
+                      Complete your personal information and unlock career guidance
+                    </CardDescription>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center p-3 bg-card/30 rounded-lg">
-                    <span className="text-sm">Personal Information</span>
-                    <span className={`text-xs px-2 py-1 rounded ${
+              <CardContent className="relative z-10 space-y-4">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-4 bg-white/60 dark:bg-gray-800/60 rounded-xl border border-orange-100 dark:border-orange-800/30">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-2 h-2 rounded-full bg-orange-500" />
+                      <span className="font-medium text-gray-900 dark:text-white">Personal Information</span>
+                    </div>
+                    <span className={`text-xs px-3 py-1.5 rounded-full font-medium ${
                       userProfile?.profile_completed 
-                        ? 'bg-success/20 text-success' 
-                        : 'bg-warning/20 text-warning'
+                        ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400' 
+                        : 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400'
                     }`}>
                       {userProfile?.profile_completed ? 'Complete' : 'Pending'}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center p-3 bg-card/30 rounded-lg">
-                    <span className="text-sm">Academic Details</span>
-                    <span className={`text-xs px-2 py-1 rounded ${
+                  <div className="flex justify-between items-center p-4 bg-white/60 dark:bg-gray-800/60 rounded-xl border border-orange-100 dark:border-orange-800/30">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-2 h-2 rounded-full bg-green-500" />
+                      <span className="font-medium text-gray-900 dark:text-white">Academic Details</span>
+                    </div>
+                    <span className={`text-xs px-3 py-1.5 rounded-full font-medium ${
                       userProfile?.profile_completed 
-                        ? 'bg-success/20 text-success' 
-                        : 'bg-warning/20 text-warning'
+                        ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400' 
+                        : 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400'
                     }`}>
                       {userProfile?.profile_completed ? 'Complete' : 'Pending'}
                     </span>
                   </div>
-                  <Link to="/profile">
-                    <Button className="w-full bg-gradient-primary hover:opacity-90">
-                      {isFirstLogin ? 'Complete Profile' : 'Edit Profile'}
-                    </Button>
-                  </Link>
                 </div>
+                <Link to="/profile" className="block">
+                  <Button className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 h-12 text-base font-semibold rounded-xl">
+                    {isFirstLogin ? 'Complete Profile' : 'Edit Profile'}
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
 
-            {/* Smart Analysis Card - Only show if profile completed */}
+            {/* Smart Analysis Card - Enhanced Design */}
             {canShowSmartAnalysis && (
-              <Card className="glass-effect hover:shadow-card transition-all duration-300 animate-slide-up">
-                <CardHeader>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-gradient-accent rounded-xl flex items-center justify-center">
-                      <Brain className="w-6 h-6 text-white" />
+              <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-500 animate-slide-up bg-gradient-to-br from-white via-white to-green-50 dark:from-background dark:via-background dark:to-green-950/20 border-2 border-green-200/50 dark:border-green-800/20">
+                <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 via-transparent to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <CardHeader className="relative z-10">
+                  <div className="flex items-center space-x-4">
+                    <div className="relative">
+                      <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+                        <Brain className="w-7 h-7 text-white" />
+                      </div>
+                      <div className="absolute -top-1 -right-1 w-6 h-6 bg-orange-500 rounded-full border-2 border-white flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">2</span>
+                      </div>
                     </div>
-                    <div>
-                      <CardTitle className="text-xl">Smart Analysis</CardTitle>
-                      <CardDescription>AI-powered aptitude and personality assessment</CardDescription>
+                    <div className="flex-1">
+                      <CardTitle className="text-xl font-bold bg-gradient-to-r from-gray-900 to-green-600 bg-clip-text text-transparent dark:from-white dark:to-green-400">
+                        Smart Analysis
+                      </CardTitle>
+                      <CardDescription className="text-gray-600 dark:text-gray-300 mt-1">
+                        AI-powered aptitude and personality assessment
+                      </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-center py-8 space-y-4">
-                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto animate-pulse-glow">
-                      <Brain className="w-8 h-8 text-primary" />
+                <CardContent className="relative z-10">
+                  <div className="text-center py-6 space-y-4">
+                    <div className="relative w-20 h-20 mx-auto">
+                      <div className="w-20 h-20 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900/40 dark:to-green-800/40 rounded-full flex items-center justify-center">
+                        <Brain className="w-10 h-10 text-green-600 dark:text-green-400" />
+                      </div>
+                      <div className="absolute inset-0 animate-ping">
+                        <div className="w-20 h-20 border-2 border-green-300 dark:border-green-600 rounded-full opacity-75" />
+                      </div>
                     </div>
-                    <h3 className="text-lg font-semibold">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                       {userProfile?.smart_analysis_completed ? 'Analysis Complete!' : 'Ready for Analysis?'}
                     </h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                       {userProfile?.smart_analysis_completed 
                         ? 'Your comprehensive assessment is complete. View your detailed insights and career recommendations.'
                         : 'Complete our comprehensive assessment to discover your strengths and ideal career paths.'
                       }
                     </p>
-                    <Link to="/smart-analysis">
-                      <Button className="bg-gradient-primary hover:opacity-90">
+                    <Link to="/smart-analysis" className="block">
+                      <Button className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 h-12 text-base font-semibold rounded-xl px-8">
                         {userProfile?.smart_analysis_completed ? 'View Results' : 'Start Analysis'}
-                        <TrendingUp className="w-4 h-4 ml-2" />
+                        <TrendingUp className="w-5 h-5 ml-2" />
                       </Button>
                     </Link>
                   </div>
@@ -623,78 +656,107 @@ const Dashboard = () => {
 
           {/* Right Column */}
           <div className="space-y-6">
-            {/* Career Quiz Card - Only show if profile completed */}
+            {/* Career Quiz Card - Enhanced Design */}
             {canShowQuiz && (
-              <Card className="glass-effect hover:shadow-card transition-all duration-300 animate-slide-up">
-                <CardHeader>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-gradient-success rounded-xl flex items-center justify-center">
-                      <BookOpen className="w-6 h-6 text-white" />
+              <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-500 animate-slide-up bg-gradient-to-br from-white via-white to-blue-50 dark:from-background dark:via-background dark:to-blue-950/20 border-2 border-blue-200/50 dark:border-blue-800/20">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <CardHeader className="relative z-10">
+                  <div className="flex items-center space-x-4">
+                    <div className="relative">
+                      <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
+                        <BookOpen className="w-7 h-7 text-white" />
+                      </div>
+                      <div className="absolute -top-1 -right-1 w-6 h-6 bg-purple-500 rounded-full border-2 border-white flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">3</span>
+                      </div>
                     </div>
-                    <div>
-                      <CardTitle className="text-xl">Career Quiz</CardTitle>
-                      <CardDescription>Interactive questionnaire to find your perfect match</CardDescription>
+                    <div className="flex-1">
+                      <CardTitle className="text-xl font-bold bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent dark:from-white dark:to-blue-400">
+                        Career Quiz
+                      </CardTitle>
+                      <CardDescription className="text-gray-600 dark:text-gray-300 mt-1">
+                        Interactive questionnaire to find your perfect career match
+                      </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="p-4 bg-gradient-to-r from-success/10 to-accent/10 rounded-lg border border-success/20">
-                      <div className="flex items-center space-x-3 mb-3">
-                        <Award className="w-5 h-5 text-success" />
-                        <span className="font-medium">Comprehensive Assessment</span>
-                      </div>
-                      <ul className="text-sm space-y-1 text-muted-foreground">
-                        <li>• Aptitude evaluation</li>
-                        <li>• Interest mapping</li>
-                        <li>• Personality insights</li>
-                      </ul>
+                <CardContent className="relative z-10 space-y-4">
+                  <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-xl border border-blue-200/50 dark:border-blue-800/30">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <Award className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                      <span className="font-semibold text-gray-900 dark:text-white">Comprehensive Assessment</span>
                     </div>
-                    <Link to="/quiz">
-                      <Button className="w-full bg-gradient-success hover:opacity-90">
-                        Take Quiz
-                        <BookOpen className="w-4 h-4 ml-2" />
-                      </Button>
-                    </Link>
+                    <div className="grid grid-cols-3 gap-3 text-sm">
+                      <div className="text-center p-2 bg-white/60 dark:bg-gray-800/60 rounded-lg">
+                        <div className="font-bold text-blue-600 dark:text-blue-400">15</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-300">Technical</div>
+                      </div>
+                      <div className="text-center p-2 bg-white/60 dark:bg-gray-800/60 rounded-lg">
+                        <div className="font-bold text-purple-600 dark:text-purple-400">30</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-300">Personal</div>
+                      </div>
+                      <div className="text-center p-2 bg-white/60 dark:bg-gray-800/60 rounded-lg">
+                        <div className="font-bold text-green-600 dark:text-green-400">25</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-300">Minutes</div>
+                      </div>
+                    </div>
                   </div>
+                  <Link to="/quiz" className="block">
+                    <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 h-12 text-base font-semibold rounded-xl">
+                      Take Quiz
+                      <BookOpen className="w-5 h-5 ml-2" />
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             )}
 
-            {/* College Explorer Card - Only show if profile completed */}
+            {/* College Explorer Card - Enhanced Design */}
             {canShowCollegeExplorer && (
-              <Card className="glass-effect hover:shadow-card transition-all duration-300 animate-slide-up">
-              <CardHeader>
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-warning to-warning-glow rounded-xl flex items-center justify-center">
-                    <MapPin className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-xl">College Explorer</CardTitle>
-                    <CardDescription>Find government colleges and admission details</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-3 bg-card/30 rounded-lg">
-                      <div className="text-2xl font-bold text-primary">150+</div>
-                      <div className="text-xs text-muted-foreground">Colleges</div>
+              <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-500 animate-slide-up bg-gradient-to-br from-white via-white to-purple-50 dark:from-background dark:via-background dark:to-purple-950/20 border-2 border-purple-200/50 dark:border-purple-800/20">
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-transparent to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <CardHeader className="relative z-10">
+                  <div className="flex items-center space-x-4">
+                    <div className="relative">
+                      <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                        <MapPin className="w-7 h-7 text-white" />
+                      </div>
+                      <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">4</span>
+                      </div>
                     </div>
-                    <div className="text-center p-3 bg-card/30 rounded-lg">
-                      <div className="text-2xl font-bold text-accent">50+</div>
-                      <div className="text-xs text-muted-foreground">Cities</div>
+                    <div className="flex-1">
+                      <CardTitle className="text-xl font-bold bg-gradient-to-r from-gray-900 to-purple-600 bg-clip-text text-transparent dark:from-white dark:to-purple-400">
+                        College Explorer
+                      </CardTitle>
+                      <CardDescription className="text-gray-600 dark:text-gray-300 mt-1">
+                        Find government colleges and admission details
+                      </CardDescription>
                     </div>
                   </div>
-                  <Link to="/college-map">
-                    <Button className="w-full bg-gradient-to-r from-warning to-warning-glow hover:opacity-90">
+                </CardHeader>
+                <CardContent className="relative z-10 space-y-4">
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="text-center p-3 bg-white/60 dark:bg-gray-800/60 rounded-xl border border-purple-100 dark:border-purple-800/30">
+                      <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">150+</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-300">Colleges</div>
+                    </div>
+                    <div className="text-center p-3 bg-white/60 dark:bg-gray-800/60 rounded-xl border border-purple-100 dark:border-purple-800/30">
+                      <div className="text-2xl font-bold text-pink-600 dark:text-pink-400">50+</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-300">Cities</div>
+                    </div>
+                    <div className="text-center p-3 bg-white/60 dark:bg-gray-800/60 rounded-xl border border-purple-100 dark:border-purple-800/30">
+                      <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">500+</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-300">Courses</div>
+                    </div>
+                  </div>
+                  <Link to="/college-map" className="block">
+                    <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 h-12 text-base font-semibold rounded-xl">
                       Explore Colleges
-                      <MapPin className="w-4 h-4 ml-2" />
+                      <MapPin className="w-5 h-5 ml-2" />
                     </Button>
                   </Link>
-                </div>
-              </CardContent>
+                </CardContent>
               </Card>
             )}
           </div>

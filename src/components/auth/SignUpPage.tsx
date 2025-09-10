@@ -10,7 +10,6 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import heroImage from '@/assets/hero-education.jpg';
 import ProfessionalNavbar from '@/components/layout/ProfessionalNavbar';
-import { SmoothCursor } from '@/components/magicui/smooth-cursor';
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -212,7 +211,7 @@ const SignUpPage = () => {
       <div className="min-h-screen bg-background flex flex-col relative">
         <ProfessionalNavbar hideAuthOptions={true} />
         <div className="min-h-screen flex">
-      <SmoothCursor />
+    
       {/* Left side - Hero Image */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         <div className="absolute inset-0">

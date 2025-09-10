@@ -1,16 +1,97 @@
+"use client";
+
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Sparkles, User, Brain, BookOpen, MapPin, Target, Users, TrendingUp, Award, ArrowRight, CheckCircle } from 'lucide-react';
-import heroImage from '@/assets/hero-education.jpg';
-import ProfessionalNavbar from '@/components/layout/ProfessionalNavbar';
-import { SmoothCursor } from '@/components/magicui/smooth-cursor';
+import { Sparkles, Brain, BookOpen, Target, MapPin, Users, TrendingUp, Award, ArrowRight, CheckCircle, Menu, X } from 'lucide-react';
+import heroImage from '@/assets/lakshya.png';
 import Footer from '@/components/layout/Footer';
+import { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { AnimatedThemeToggler } from '@/magicui/animated-theme-toggler';
 
 const Index = () => {
+  const { user } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col relative">
-      <ProfessionalNavbar />
-      
+      {/* Navigation with Mobile Menu */}
+      <nav className="flex items-center justify-between p-4 bg-card/50 backdrop-blur-sm border-b border-primary/10">
+        <header className="w-full">
+          <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+            {/* Logo Section */}
+            <div className="flex items-center space-x-4">
+              <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+                <div className="w-10 h-10 bg-gradient-professional rounded-xl flex items-center justify-center shadow-lg">
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold font-space-grotesk text-foreground">
+                    Lakshya
+                  </span>
+                  <span className="text-xs text-muted-foreground -mt-1">Career Guidance</span>
+                </div>
+              </Link>
+            </div>
+
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center space-x-4">
+              <AnimatedThemeToggler className="h-8 w-8" />
+              <Link to="/sign-in">
+                <Button variant="outline" className="text-base px-6 py-2 h-auto border-primary/30 hover:border-primary/50">
+                  Sign In
+                </Button>
+              </Link>
+              <Link to="/sign-up">
+                <Button className="bg-gradient-professional text-base px-6 py-2 h-auto hover:opacity-90">
+                  Get Started
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </header>
+
+        {/* Mobile Menu Toggle */}
+        <div className="md:hidden">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleMenu}
+            className="rounded-full hover:bg-primary/10"
+            aria-label="Toggle menu"
+          >
+            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </Button>
+        </div>
+      </nav>
+      {/* Mobile Menu Dropdown */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-card/90 backdrop-blur-sm border-b border-primary/10 p-4 absolute top-16 left-0 right-0 z-50 animate-slide-down">
+          <div className="flex flex-col space-y-4">
+            <div className="flex items-center justify-between px-3 py-2">
+              <span className="text-base font-medium">Theme</span>
+              <AnimatedThemeToggler className="h-8 w-8" />
+            </div>
+            <Link to="/sign-in" onClick={toggleMenu}>
+              <Button variant="outline" className="w-full text-base py-2 h-auto border-primary/30 hover:border-primary/50">
+                Sign In
+              </Button>
+            </Link>
+            <Link to="/sign-up" onClick={toggleMenu}>
+              <Button className="w-full bg-gradient-professional text-base py-2 h-auto hover:opacity-90">
+                Get Started
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Hero Section */}
       <main className="relative overflow-hidden flex-1">
         {/* <div className="absolute inset-0">
@@ -21,25 +102,30 @@ const Index = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-background/80 to-background/90" />
         </div> */}
-        
+
         <div className="relative z-10 flex items-center justify-center min-h-[80vh] pt-16">
           <div className="text-center max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 animate-slide-up">
-            <div className="w-32 h-32 bg-gradient-professional rounded-full flex items-center justify-center mx-auto mb-8 animate-glow shadow-2xl">
-              <Sparkles className="w-16 h-16 text-white drop-shadow-lg" />
+            <div className="w-32 h-38 flex items-center justify-center mx-auto mb-8 animate-glow shadow-2xl overflow-hidden bg-transparent">
+              <img
+              src={heroImage}
+              alt="Lakshya Hero"
+              className="w-full h-full object-contain bg-transparent"
+              style={{ background: "transparent" }}
+              />
             </div>
-            
+
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-space-grotesk mb-6 leading-tight">
               Discover Your{' '}
               <span className="bg-gradient-professional bg-clip-text text-transparent">Lakshya</span>
               <br />
               <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-muted-foreground">with Smart AI Guidance</span>
             </h1>
-            
+
             <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-12 max-w-4xl mx-auto leading-relaxed px-4">
-              Unlock your potential with AI-powered career analysis, personalized college recommendations, 
+              Unlock your potential with AI-powered career analysis, personalized college recommendations,
               and smart guidance tailored for Indian students. Join thousands making informed education decisions.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center mb-20 px-4">
               <Link to="/sign-up" className="w-full sm:w-auto">
                 <Button size="lg" className="bg-gradient-professional hover:opacity-90 text-base sm:text-lg px-8 sm:px-12 py-4 sm:py-6 h-auto w-full sm:w-auto shadow-lg hover:shadow-xl transition-shadow">
@@ -66,7 +152,7 @@ const Index = () => {
                 </div>
               </div>
             </div>
-            
+
             {/* Stats Section */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
               <div className="text-center">
@@ -111,7 +197,7 @@ const Index = () => {
                   Advanced AI assessment analyzing your personality traits and natural abilities
                 </p>
               </div>
-              
+
               <div className="glass-effect p-6 sm:p-8 rounded-2xl text-center hover:shadow-accent-glow transition-all duration-500 group">
                 <div className="w-12 sm:w-16 h-12 sm:h-16 bg-gradient-accent rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 group-hover:animate-pulse">
                   <BookOpen className="w-6 sm:w-8 h-6 sm:h-8 text-white" />
@@ -121,7 +207,7 @@ const Index = () => {
                   Smart quiz combining aptitude + interests for precise career matching
                 </p>
               </div>
-              
+
               <div className="glass-effect p-6 sm:p-8 rounded-2xl text-center hover:shadow-glow transition-all duration-500 group">
                 <div className="w-12 sm:w-16 h-12 sm:h-16 bg-gradient-success rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 group-hover:animate-pulse">
                   <Target className="w-6 sm:w-8 h-6 sm:h-8 text-white" />
@@ -154,10 +240,10 @@ const Index = () => {
                   Why Students Choose <span className="gradient-text">Lakshya</span>
                 </h2>
                 <p className="text-base sm:text-lg text-muted-foreground mb-8">
-                  We combine advanced AI technology with deep understanding of the Indian education system 
+                  We combine advanced AI technology with deep understanding of the Indian education system
                   to provide the most accurate and personalized career guidance.
                 </p>
-                
+
                 <div className="space-y-4">
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="w-6 h-6 text-success" />
@@ -222,7 +308,7 @@ const Index = () => {
           </div>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );
