@@ -15,6 +15,7 @@ const Quiz2 = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [questions, setQuestions] = useState([]);
+  const [isLoading, setIsLoading] = useState(false); // New state for loading
 
   const physicalAppearanceQuestions = [
     { id: "Physical-0", text: "Body Frame", options: ["Thin and Lean", "Medium", "Well Built"] },
@@ -51,7 +52,6 @@ const Quiz2 = () => {
 
   useEffect(() => {
     setQuestions(physicalAppearanceQuestions);
-    // Auto-start if coming from Quiz1
     const personalityAnswers = localStorage.getItem("personalityAnswers");
     if (personalityAnswers) {
       setIsStarted(true);
@@ -74,6 +74,7 @@ const Quiz2 = () => {
   };
 
   const handleCompleteQuiz = async () => {
+    setIsLoading(true); // Start loading state
     try {
       const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
       const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
@@ -99,7 +100,7 @@ const Quiz2 = () => {
 
       setTimeout(() => {
         navigate("/results");
-      }, 2000);
+      }, 500); // Reduced from 2000ms to 500ms
     } catch (error) {
       console.error("Error with Gemini API:", error);
       toast({
@@ -110,7 +111,9 @@ const Quiz2 = () => {
       localStorage.setItem("physicalAnswers", JSON.stringify(answers)); // Store answers even on error
       setTimeout(() => {
         navigate("/results");
-      }, 2000);
+      }, 500); // Reduced from 2000ms to 500ms
+    } finally {
+      setIsLoading(false); // End loading state
     }
   };
 
@@ -252,9 +255,8 @@ const Quiz2 = () => {
                             <Button
                               key={option}
                               variant={answers[questions[currentQuestionIndex]?.id] === option ? "default" : "outline"}
-                              className={`w-full h-auto py-1 sm:py-2 px-2 sm:px-4 text-xs sm:text-sm text-left ${
-                                answers[questions[currentQuestionIndex]?.id] === option ? "bg-gradient-primary" : ""
-                              } whitespace-normal break-words`}
+                              className={`w-full h-auto py-1 sm:py-2 px-2 sm:px-4 text-xs sm:text-sm text-left ${answers[questions[currentQuestionIndex]?.id] === option ? "bg-gradient-primary" : ""
+                                } whitespace-normal break-words`}
                               onClick={() => handleAnswer(questions[currentQuestionIndex]?.id, option)}
                               disabled={!questions[currentQuestionIndex]?.options}
                             >
@@ -276,11 +278,26 @@ const Quiz2 = () => {
                         {currentQuestionIndex === questions.length - 1 && (
                           <Button
                             onClick={handleCompleteQuiz}
-                            className="w-full sm:w-auto bg-gradient-primary hover:opacity-90 text-sm sm:text-base py-1 sm:py-2 px-2 sm:px-4"
-                            disabled={!answers[questions[currentQuestionIndex]?.id]}
+                            className={`w-full sm:w-auto text-sm sm:text-base py-1 sm:py-2 px-2 sm:px-4 ${isLoading ? "cursor-not-allowed" : "bg-gradient-primary hover:opacity-90"
+                              }`}
+                            disabled={isLoading || !answers[questions[currentQuestionIndex]?.id]}
                           >
-                            Complete Quiz
-                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
+                            {isLoading ? (
+                              // Show only the loader when loading - no button wrapper
+                              <div className="flex justify-center items-center w-full sm:w-auto py-4">
+                                <div className="w-8 h-8 border-4 border-white border-t-orange-500 rounded-full animate-spin"></div>
+                              </div>
+                            ) : (
+                              // Show the button when not loading
+                              <Button
+                                onClick={handleCompleteQuiz}
+                                className="w-full sm:w-auto text-sm sm:text-base py-1 sm:py-2 px-2 sm:px-4 bg-gradient-primary hover:opacity-90"
+                                disabled={!answers[questions[currentQuestionIndex]?.id]}
+                              >
+                                Complete Quiz
+                                <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
+                              </Button>
+                            )}
                           </Button>
                         )}
                       </div>
