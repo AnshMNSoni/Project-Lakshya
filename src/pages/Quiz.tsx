@@ -98,15 +98,11 @@ const Quiz = () => {
     const payload = { answers: [probabilities] };
 
     try {
-      const response = await fetch("/api/predict", {
+      const response = await fetch("https://lakshya-backend-udf3.onrender.com/predict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
 
       const result = await response.json();
       if (result.error) {
@@ -235,18 +231,6 @@ const Quiz = () => {
             <CardContent className="p-4 sm:p-6">
               {prediction ? (
                 <div className="text-center py-8 animate-fade-in">
-                  <div className="relative mb-6">
-                    <div className="absolute inset-0 bg-gradient-to-r from-success/20 to-primary/20 rounded-full blur-xl animate-pulse" />
-                    <div className="relative w-24 h-24 bg-gradient-success rounded-full flex items-center justify-center mx-auto animate-bounce">
-                      <Star className="w-12 h-12 text-white" />
-                    </div>
-                  </div>
-                  <h3 className="text-2xl sm:text-3xl font-bold font-space-grotesk mb-4 text-gradient bg-clip-text text-transparent bg-gradient-to-r from-success to-primary">
-                    Your Ideal Career Path
-                  </h3>
-                  <p className="text-xl sm:text-2xl font-semibold text-success mb-6">
-                    {prediction}
-                  </p>
                   <Button
                     className="bg-gradient-primary hover:bg-gradient-primary/90 text-white px-6 py-2 rounded-full transition-transform hover:scale-105"
                     onClick={() => navigate("/dashboard")}
@@ -290,11 +274,10 @@ const Quiz = () => {
                             ? "default"
                             : "outline"
                         }
-                        className={`w-full h-auto py-1 sm:py-2 px-2 sm:px-4 text-xs sm:text-sm text-left ${
-                          answers[currentQuestion?.id] === option
+                        className={`w-full h-auto py-1 sm:py-2 px-2 sm:px-4 text-xs sm:text-sm text-left ${answers[currentQuestion?.id] === option
                             ? "bg-gradient-primary"
                             : ""
-                        } whitespace-normal break-words`}
+                          } whitespace-normal break-words`}
                         onClick={() =>
                           handleAnswer(currentQuestion?.id, option)
                         }
@@ -311,8 +294,8 @@ const Quiz = () => {
                       onClick={() =>
                         currentQuestionIndex > 0
                           ? setCurrentQuestionIndex(
-                              currentQuestionIndex - 1
-                            )
+                            currentQuestionIndex - 1
+                          )
                           : setCurrentStep(currentStep - 1)
                       }
                       disabled={currentStep === 1 && currentQuestionIndex === 0}
