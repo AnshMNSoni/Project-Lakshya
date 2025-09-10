@@ -10,7 +10,6 @@ import { supabase } from '@/integrations/supabase/client';
 import heroImage from '@/assets/hero-education.jpg';
 import ProfessionalNavbar from '@/components/layout/ProfessionalNavbar';
 
-
 const SignInPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,7 +22,6 @@ const SignInPage = () => {
   const navigate = useNavigate();
 
   const validateForm = () => {
-    // Mobile number validation (10 digits)
     if (!/^\d{10}$/.test(formData.mobile)) {
       toast({
         variant: "destructive",
@@ -33,7 +31,6 @@ const SignInPage = () => {
       return false;
     }
 
-    // Password validation (minimum 8 characters, at least one letter and one number)
     if (formData.password.length < 8) {
       toast({
         variant: "destructive",
@@ -57,13 +54,13 @@ const SignInPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setIsLoading(true);
-    
+
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email: formData.email,
@@ -103,47 +100,29 @@ const SignInPage = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col relative">
-    
       <ProfessionalNavbar hideAuthOptions={true} />
       <main className="flex-1">
         <div className="min-h-[calc(100vh-64px)] flex">
           {/* Left side - Hero Image */}
-          <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-            <div className="absolute inset-0">
-              {/* <img
-                src={heroImage}
-                alt="EduGuide - Smart Career Guidance"
-                className="w-full h-full object-cover opacity-80"
-              /> */}
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10" />
-            </div>
-            <div className="relative z-10 flex flex-col justify-center p-12">
-              <div className="animate-float">
-                <Sparkles className="w-16 h-16 mb-6 text-accent-glow" />
-              </div>
-            <h1 className="text-5xl font-bold mb-6 font-space-grotesk">
-                Your Future
-                <span className="block bg-gradient-professional bg-clip-text text-transparent">Starts Here</span>
-              </h1>
-              <p className="text-xl mb-8 font-space-grotesk">
-                AI-powered career guidance platform helping students make informed education decisions and discover their perfect career path.
-              </p>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-accent-glow rounded-full animate-pulse" />
-                  <span className="font-space-grotesk">Personalized career recommendations</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-success-glow rounded-full animate-pulse" />
-                  <span className="font-space-grotesk">Government college directory</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-warning-glow rounded-full animate-pulse" />
-                  <span className="font-space-grotesk">Smart aptitude analysis</span>
-                </div>
-              </div>
-            </div>
+            <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+          {/* Background Image */}
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: "url('/FrontPage.jpg')" }}
+          />
+
+          {/* Dark/Light Theme Overlay - appears above background image with reduced opacity */}
+          <div className="absolute inset-0 bg-background/20 dark:bg-background/30" />
+
+          {/* Background Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-accent/30 to-primary/40 dark:from-primary/50 dark:via-accent/40 dark:to-primary/50" />
+
+          {/* Foreground Content */}
+          <div className="relative z-10 flex flex-col justify-center p-12 text-foreground">
+            {/* You can add signup-related content here later if needed */}
           </div>
+        </div>
+
 
           {/* Right side - Sign In Form */}
           <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-background">
@@ -253,7 +232,7 @@ const SignInPage = () => {
                       </Link>
                     </div>
                   </CardContent>
-                  
+
                   <CardFooter className="flex flex-col space-y-4">
                     <Button
                       type="submit"
@@ -269,7 +248,7 @@ const SignInPage = () => {
                         'Sign In'
                       )}
                     </Button>
-                    
+
                     <div className="text-center text-sm text-muted-foreground">
                       Don't have an account?{' '}
                       <Link
