@@ -57,11 +57,6 @@ const Results = () => {
         }
       } catch (error) {
         console.error("Error generating recommendations:", error);
-        toast({
-          title: "Error",
-          description: "Failed to generate recommendations. Using default fallback.",
-          variant: "destructive",
-        });
         setRecommendations(["Freelance Writer", "UX/UI Designer", "Data Analyst", "Marketing Consultant"]); // fallback
       } finally {
         setLoading(false);
