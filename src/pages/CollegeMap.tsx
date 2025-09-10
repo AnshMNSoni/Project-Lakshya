@@ -1,10 +1,11 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, MapPin, Navigation, Search, Filter, Globe, Bot } from 'lucide-react';
+import { ArrowLeft, MapPin, Navigation, Search, Filter, Globe, Bot, Sparkles } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 import { CollegeBreadcrumbWithDropdown } from '@/components/common/LakshyaBreadcrumb';
+import { AnimatedThemeToggler } from '@/magicui/animated-theme-toggler';
 
 const CollegeMap = () => {
   const navigate = useNavigate();
@@ -13,24 +14,26 @@ const CollegeMap = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="glass-effect border-b border-border/50 sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center h-16 space-x-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/dashboard')}
-              className="hover:bg-card/50"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Dashboard
-            </Button>
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-success to-success-glow rounded-lg flex items-center justify-center">
-                <MapPin className="w-4 h-4 text-white" />
-              </div>
-              <div>
-                <h1 className="text-lg font-bold font-space-grotesk">College Explorer Map</h1>
-              </div>
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-14 sm:h-16">
+            <div className="flex items-center">
+              <Link to="/dashboard">
+                <Button variant="ghost" size="sm" className="p-2 sm:px-3">
+                  <ArrowLeft className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Back to Dashboard</span>
+                </Button>
+              </Link>
+            </div>
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <Link to="/dashboard" className="flex items-center space-x-2 sm:space-x-3">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
+                  <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                </div>
+                <span className="text-lg sm:text-xl font-bold font-space-grotesk gradient-text">
+                  Lakshya
+                </span>
+              </Link>
+              <AnimatedThemeToggler className="h-8 w-8" />
             </div>
           </div>
         </div>

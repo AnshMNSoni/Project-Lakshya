@@ -1,15 +1,19 @@
+// Results.tsx
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import CollegeMap from "./CollegeMap"; // Import the new CollegeMap component
 
 const Results = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [recommendations, setRecommendations] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showMap, setShowMap] = useState(false); // State to toggle map visibility
 
   useEffect(() => {
     const generateRecommendations = async () => {
@@ -96,14 +100,21 @@ const Results = () => {
                   </li>
                 ))}
               </ul>
-              <div className="text-center">
+              <div className="text-center space-x-4">
                 <Button
                   onClick={() => navigate("/dashboard")}
                   className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-3 rounded-lg text-sm sm:text-base transition-all duration-300 hover:shadow-md"
                 >
                   Back to Dashboard
                 </Button>
+                <Button
+                  onClick={() => setShowMap(!showMap)}
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-lg text-sm sm:text-base transition-all duration-300 hover:shadow-md"
+                >
+                  {showMap ? "Hide Colleges Map" : "Find Colleges"}
+                </Button>
               </div>
+              {showMap && <CollegeMap />}
             </div>
           )}
         </CardContent>
