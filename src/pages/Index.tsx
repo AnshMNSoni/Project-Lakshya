@@ -104,15 +104,18 @@ const Index = () => {
         </div> */}
 
         <div className="relative z-10 flex items-center justify-center min-h-[80vh] pt-16">
-          <div className="text-center max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 animate-slide-up">
-            <div className="w-32 h-38 flex items-center justify-center mx-auto mb-8 animate-glow shadow-2xl overflow-hidden bg-transparent">
-              <img
+            <div className="text-center max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 animate-slide-up">
+            <img
               src={heroImage}
               alt="Lakshya Hero"
-              className="w-full h-full object-contain bg-transparent"
-              style={{ background: "transparent" }}
-              />
-            </div>
+              className="w-18 h-20 xl:w-48 xl:h-56 object-contain bg-transparent hero-image-transparent mx-auto block drop-shadow-[0_0_20px_rgba(255,165,0,0.7)]"
+              style={{
+              background: "transparent",
+              mixBlendMode: "multiply",
+              }}
+            />
+            <br />
+            <br />
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-space-grotesk mb-6 leading-tight">
               Discover Your{' '}
@@ -128,51 +131,51 @@ const Index = () => {
 
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center mb-20 px-4">
               <Link to="/sign-up" className="w-full sm:w-auto">
-                <Button size="lg" className="bg-gradient-professional hover:opacity-90 text-base sm:text-lg px-8 sm:px-12 py-4 sm:py-6 h-auto w-full sm:w-auto shadow-lg hover:shadow-xl transition-shadow">
-                  Start Your Journey
-                  <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5 ml-2" />
-                </Button>
+              <Button size="lg" className="bg-gradient-professional hover:opacity-90 text-base sm:text-lg px-8 sm:px-12 py-4 sm:py-6 h-auto w-full sm:w-auto shadow-lg hover:shadow-xl transition-shadow">
+                Start Your Journey
+                <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5 ml-2" />
+              </Button>
               </Link>
               <Link to="/sign-in" className="w-full sm:w-auto">
-                <Button size="lg" variant="outline" className="text-base sm:text-lg px-8 sm:px-12 py-4 sm:py-6 h-auto glass-effect border-primary/30 hover:border-primary/50 w-full sm:w-auto">
-                  I Have an Account
-                </Button>
+              <Button size="lg" variant="outline" className="text-base sm:text-lg px-8 sm:px-12 py-4 sm:py-6 h-auto glass-effect border-primary/30 hover:border-primary/50 w-full sm:w-auto">
+                I Have an Account
+              </Button>
               </Link>
             </div>
 
             {/* Enhanced Robot Check */}
             <div className="flex items-center justify-center mb-12 px-4">
               <div className="glass-effect p-4 rounded-xl border border-primary/20 flex items-center space-x-3 bg-gradient-to-r from-primary/5 to-accent/5">
-                <div className="w-6 h-6 border-2 border-primary rounded flex items-center justify-center">
-                  <CheckCircle className="w-4 h-4 text-primary" />
-                </div>
-                <span className="text-sm text-muted-foreground">I'm not a robot</span>
-                <div className="text-xs text-muted-foreground bg-primary/10 px-2 py-1 rounded">
-                  Verified by Lakshya AI
-                </div>
+              <div className="w-6 h-6 border-2 border-primary rounded flex items-center justify-center">
+                <CheckCircle className="w-4 h-4 text-primary" />
+              </div>
+              <span className="text-sm text-muted-foreground">I'm not a robot</span>
+              <div className="text-xs text-muted-foreground bg-primary/10 px-2 py-1 rounded">
+                Verified by Lakshya AI
+              </div>
               </div>
             </div>
 
             {/* Stats Section */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
               <div className="text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">25K+</div>
-                <div className="text-xs sm:text-sm text-muted-foreground">Students Guided</div>
+              <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">25K+</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Students Guided</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-accent mb-2">1200+</div>
-                <div className="text-xs sm:text-sm text-muted-foreground">Colleges Listed</div>
+              <div className="text-2xl sm:text-3xl font-bold text-accent mb-2">1200+</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Colleges Listed</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-success mb-2">98%</div>
-                <div className="text-xs sm:text-sm text-muted-foreground">Success Rate</div>
+              <div className="text-2xl sm:text-3xl font-bold text-success mb-2">98%</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Success Rate</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-warning mb-2">24/7</div>
-                <div className="text-xs sm:text-sm text-muted-foreground">AI Support</div>
+              <div className="text-2xl sm:text-3xl font-bold text-warning mb-2">24/7</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">AI Support</div>
               </div>
             </div>
-          </div>
+            </div>
         </div>
 
         {/* Features Section */}
