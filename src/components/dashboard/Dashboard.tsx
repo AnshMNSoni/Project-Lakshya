@@ -22,7 +22,11 @@ import {
   ClipboardList,
   Lightbulb,
   CheckCircle,
-  ArrowRight
+  ArrowRight,
+  ArrowDown,
+  Users,
+  BarChart3,
+  Phone
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Footer from '@/components/layout/Footer';
@@ -145,7 +149,38 @@ const Dashboard = () => {
       ),
     },
     {
-      title: "Personalized Recommendations",
+      title: "Quiz Analysis",
+      content: (
+        <div>
+          <p className="mb-6 text-sm font-normal text-foreground md:text-base dark:text-foreground">
+            Assess your skills with a structured quiz covering technical knowledge, physical abilities, and mental health. Based on your performance, get personalized stream recommendations.
+          </p>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 text-sm text-muted-foreground md:text-base dark:text-muted-foreground">
+              <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
+                <BarChart3 className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+              </div>
+              15 Technical Knowledge Questions
+            </div>
+            <div className="flex items-center gap-3 text-sm text-muted-foreground md:text-base dark:text-muted-foreground">
+              <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
+                <Users className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+              </div>
+              30 Physical, Mental & Health Skill Questions
+            </div>
+            <div className="flex items-center gap-3 text-sm text-muted-foreground md:text-base dark:text-muted-foreground">
+              <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
+                <Target className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+              </div>
+              Stream Recommendations Based on Analysis
+            </div>
+          </div>
+        </div>
+      ),
+    },
+
+    {
+      title: "Career Recommendations",
       content: (
         <div>
           <p className="mb-6 text-sm font-normal text-foreground md:text-base dark:text-foreground">
@@ -262,7 +297,7 @@ const Dashboard = () => {
               <div className="hidden sm:flex items-center space-x-2">
                 <Link to="/profile">
                   <Button variant="ghost" size="sm" className="hover:bg-card/50">
-                    <Settings className="w-4 h-4 mr-2" />
+                    <User className="w-4 h-4 mr-2" />
                     Profile
                   </Button>
                 </Link>
@@ -285,7 +320,7 @@ const Dashboard = () => {
                       <Menu className="w-5 h-5" />
                     </Button>
                   </SheetTrigger>
-                  <SheetContent side="right"className="w-[300px] bg-white dark:bg-neutral-900 border-border/20">
+                  <SheetContent side="right" className="w-[300px] bg-white dark:bg-neutral-900 border-border/20">
 
                     <div className="flex flex-col h-full">
                       {/* Header */}
@@ -296,17 +331,6 @@ const Dashboard = () => {
                       {/* Navigation Links */}
                       <div className="flex-1 py-6">
                         <div className="space-y-2">
-                          {/* Career Quiz - Only show if profile completed but smart analysis not done */}
-                          {canShowQuiz && (
-                            <Link
-                              to="/quiz"
-                              className="flex items-center px-4 py-3 text-base font-medium rounded-xl hover:text-primary hover:bg-primary/5 transition-all duration-200"
-                              onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                              <BookOpen className="mr-3 h-5 w-5" />
-                              Career Quiz
-                            </Link>
-                          )}
 
                           {/* Smart Analysis - Only show if profile completed */}
                           {canShowSmartAnalysis && (
@@ -317,6 +341,18 @@ const Dashboard = () => {
                             >
                               <Brain className="mr-3 h-5 w-5" />
                               Smart Analysis
+                            </Link>
+                          )}
+
+                          {/* Career Quiz - Only show if profile completed but smart analysis not done */}
+                          {canShowQuiz && (
+                            <Link
+                              to="/quiz"
+                              className="flex items-center px-4 py-3 text-base font-medium rounded-xl hover:text-primary hover:bg-primary/5 transition-all duration-200"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                              <BookOpen className="mr-3 h-5 w-5" />
+                              Career Quiz
                             </Link>
                           )}
 
@@ -420,7 +456,7 @@ const Dashboard = () => {
               className="flex flex-col items-center p-3 sm:p-4 md:p-6 bg-card/50 hover:bg-card/70 rounded-lg sm:rounded-xl border border-border/50 hover:border-primary/50 transition-all duration-300 group"
             >
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-warning to-warning-glow rounded-lg sm:rounded-xl flex items-center justify-center mb-2 sm:mb-3 group-hover:scale-110 transition-transform">
-                <Settings className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                <Phone className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <span className="text-xs sm:text-sm md:text-base font-medium text-center">Contact</span>
             </Link>
@@ -433,7 +469,7 @@ const Dashboard = () => {
             Welcome {userProfile?.name ? userProfile.name.split(' ')[0] : 'Student'}!
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground">
-            {isFirstLogin 
+            {isFirstLogin
               ? "Complete your profile to unlock personalized career guidance"
               : "Track your progress and explore career opportunities tailored for you."
             }
@@ -455,8 +491,8 @@ const Dashboard = () => {
               </div>
               <Progress value={userProfile?.profile_completed ? 100 : 25} className="mt-2" />
               <p className="text-xs text-muted-foreground mt-1">
-                {userProfile?.profile_completed 
-                  ? 'Profile completed successfully!' 
+                {userProfile?.profile_completed
+                  ? 'Profile completed successfully!'
                   : 'Complete your profile to get better recommendations'
                 }
               </p>
@@ -475,8 +511,8 @@ const Dashboard = () => {
                 {userProfile?.smart_analysis_completed ? 'Complete' : 'Pending'}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                {userProfile?.smart_analysis_completed 
-                  ? 'Smart analysis completed!' 
+                {userProfile?.smart_analysis_completed
+                  ? 'Smart analysis completed!'
                   : 'Complete aptitude analysis to unlock recommendations'
                 }
               </p>
@@ -495,8 +531,8 @@ const Dashboard = () => {
                 {userProfile?.quiz_completed ? 'Complete' : 'Pending'}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                {userProfile?.quiz_completed 
-                  ? 'Career quiz completed!' 
+                {userProfile?.quiz_completed
+                  ? 'Career quiz completed!'
                   : 'Take the career quiz for detailed insights'
                 }
               </p>
@@ -515,9 +551,9 @@ const Dashboard = () => {
                 {isFirstLogin ? '1' : userProfile?.profile_completed && !userProfile?.smart_analysis_completed ? '2' : '0'}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                {isFirstLogin 
-                  ? 'Complete your profile setup' 
-                  : userProfile?.profile_completed && !userProfile?.smart_analysis_completed 
+                {isFirstLogin
+                  ? 'Complete your profile setup'
+                  : userProfile?.profile_completed && !userProfile?.smart_analysis_completed
                     ? 'Take smart analysis and quiz'
                     : 'All tasks completed!'
                 }
@@ -534,73 +570,73 @@ const Dashboard = () => {
         </div>
 
 
-        {/* Main Features Grid - Enhanced Design */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-          {/* Left Column */}
-          <div className="space-y-6">
-            {/* Profile Card - Always shown with enhanced design */}
-            <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-500 animate-slide-up bg-gradient-to-br from-white via-white to-orange-50 dark:from-background dark:via-background dark:to-orange-950/20 border-2 border-orange-200/50 dark:border-orange-800/20">
-              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-transparent to-green-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <CardHeader className="relative z-10">
-                <div className="flex items-center space-x-4">
-                  <div className="relative">
-                    <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
-                      <User className="w-7 h-7 text-white" />
-                    </div>
-                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">1</span>
-                    </div>
+        {/* Main Features - Vertical stack with path connectors */}
+        <div className="space-y-6">
+          {/* Profile Management Card - Always shown */}
+          <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-500 animate-slide-up bg-gradient-to-br from-white via-white to-orange-50 dark:from-background dark:via-background dark:to-orange-950/20 border-2 border-orange-200/50 dark:border-orange-800/20">
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-transparent to-green-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <CardHeader className="relative z-10">
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
+                    <User className="w-7 h-7 text-white" />
                   </div>
-                  <div className="flex-1">
-                    <CardTitle className="text-xl font-bold bg-gradient-to-r from-gray-900 to-orange-600 bg-clip-text text-transparent dark:from-white dark:to-orange-400">
-                      Profile Management
-                    </CardTitle>
-                    <CardDescription className="text-gray-600 dark:text-gray-300 mt-1">
-                      Complete your personal information and unlock career guidance
-                    </CardDescription>
+                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">1</span>
                   </div>
                 </div>
-              </CardHeader>
-              <CardContent className="relative z-10 space-y-4">
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center p-4 bg-white/60 dark:bg-gray-800/60 rounded-xl border border-orange-100 dark:border-orange-800/30">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 rounded-full bg-orange-500" />
-                      <span className="font-medium text-gray-900 dark:text-white">Personal Information</span>
-                    </div>
-                    <span className={`text-xs px-3 py-1.5 rounded-full font-medium ${
-                      userProfile?.profile_completed 
-                        ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400' 
-                        : 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400'
-                    }`}>
-                      {userProfile?.profile_completed ? 'Complete' : 'Pending'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center p-4 bg-white/60 dark:bg-gray-800/60 rounded-xl border border-orange-100 dark:border-orange-800/30">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 rounded-full bg-green-500" />
-                      <span className="font-medium text-gray-900 dark:text-white">Academic Details</span>
-                    </div>
-                    <span className={`text-xs px-3 py-1.5 rounded-full font-medium ${
-                      userProfile?.profile_completed 
-                        ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400' 
-                        : 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400'
-                    }`}>
-                      {userProfile?.profile_completed ? 'Complete' : 'Pending'}
-                    </span>
-                  </div>
+                <div className="flex-1">
+                  <CardTitle className="text-xl font-bold bg-gradient-to-r from-gray-900 to-orange-600 bg-clip-text text-transparent dark:from-white dark:to-orange-400">
+                    Profile Management
+                  </CardTitle>
+                  <CardDescription className="text-gray-600 dark:text-gray-300 mt-1">
+                    Complete your personal information and unlock career guidance
+                  </CardDescription>
                 </div>
-                <Link to="/profile" className="block">
-                  <Button className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 h-12 text-base font-semibold rounded-xl">
-                    {isFirstLogin ? 'Complete Profile' : 'Edit Profile'}
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+              </div>
+            </CardHeader>
+            <CardContent className="relative z-10 space-y-4">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center p-4 bg-white/60 dark:bg-gray-800/60 rounded-xl border border-orange-100 dark:border-orange-800/30">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-2 h-2 rounded-full bg-orange-500" />
+                    <span className="font-medium text-gray-900 dark:text-white">Personal Information</span>
+                  </div>
+                  <span className={`text-xs px-3 py-1.5 rounded-full font-medium ${userProfile?.profile_completed
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400'
+                    : 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400'
+                    }`}>
+                    {userProfile?.profile_completed ? 'Complete' : 'Pending'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-4 bg-white/60 dark:bg-gray-800/60 rounded-xl border border-orange-100 dark:border-orange-800/30">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-2 h-2 rounded-full bg-green-500" />
+                    <span className="font-medium text-gray-900 dark:text-white">Academic Details</span>
+                  </div>
+                  <span className={`text-xs px-3 py-1.5 rounded-full font-medium ${userProfile?.profile_completed
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400'
+                    : 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400'
+                    }`}>
+                    {userProfile?.profile_completed ? 'Complete' : 'Pending'}
+                  </span>
+                </div>
+              </div>
+              <Link to="/profile" className="block">
+                <Button className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 h-12 text-base font-semibold rounded-xl">
+                  {isFirstLogin ? 'Complete Profile' : 'Edit Profile'}
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
 
-            {/* Smart Analysis Card - Enhanced Design */}
-            {canShowSmartAnalysis && (
+          {/* Connector and Smart Analysis Card */}
+          {canShowSmartAnalysis && (
+            <>
+              <div className="flex justify-center">
+                <ArrowDown className="w-8 h-8 text-primary/50 animate-bounce" />
+              </div>
               <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-500 animate-slide-up bg-gradient-to-br from-white via-white to-green-50 dark:from-background dark:via-background dark:to-green-950/20 border-2 border-green-200/50 dark:border-green-800/20">
                 <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 via-transparent to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <CardHeader className="relative z-10">
@@ -637,7 +673,7 @@ const Dashboard = () => {
                       {userProfile?.smart_analysis_completed ? 'Analysis Complete!' : 'Ready for Analysis?'}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-                      {userProfile?.smart_analysis_completed 
+                      {userProfile?.smart_analysis_completed
                         ? 'Your comprehensive assessment is complete. View your detailed insights and career recommendations.'
                         : 'Complete our comprehensive assessment to discover your strengths and ideal career paths.'
                       }
@@ -651,13 +687,15 @@ const Dashboard = () => {
                   </div>
                 </CardContent>
               </Card>
-            )}
-          </div>
+            </>
+          )}
 
-          {/* Right Column */}
-          <div className="space-y-6">
-            {/* Career Quiz Card - Enhanced Design */}
-            {canShowQuiz && (
+          {/* Connector and Career Quiz Card */}
+          {canShowQuiz && (
+            <>
+              <div className="flex justify-center">
+                <ArrowDown className="w-8 h-8 text-primary/50 animate-bounce" />
+              </div>
               <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-500 animate-slide-up bg-gradient-to-br from-white via-white to-blue-50 dark:from-background dark:via-background dark:to-blue-950/20 border-2 border-blue-200/50 dark:border-blue-800/20">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <CardHeader className="relative z-10">
@@ -709,10 +747,15 @@ const Dashboard = () => {
                   </Link>
                 </CardContent>
               </Card>
-            )}
+            </>
+          )}
 
-            {/* College Explorer Card - Enhanced Design */}
-            {canShowCollegeExplorer && (
+          {/* Connector and College Explorer Card */}
+          {canShowCollegeExplorer && (
+            <>
+              <div className="flex justify-center">
+                <ArrowDown className="w-8 h-8 text-primary/50 animate-bounce" />
+              </div>
               <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-500 animate-slide-up bg-gradient-to-br from-white via-white to-purple-50 dark:from-background dark:via-background dark:to-purple-950/20 border-2 border-purple-200/50 dark:border-purple-800/20">
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-transparent to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <CardHeader className="relative z-10">
@@ -758,52 +801,9 @@ const Dashboard = () => {
                   </Link>
                 </CardContent>
               </Card>
-            )}
-          </div>
+            </>
+          )}
         </div>
-
-        {/* Recent Activity */}
-        <Card className="mt-8 glass-effect animate-slide-up">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Calendar className="w-5 h-5 text-primary" />
-              <span>Getting Started</span>
-            </CardTitle>
-            <CardDescription>Complete these steps to unlock all features</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3 p-3 bg-card/30 rounded-lg">
-                <div className="w-6 h-6 bg-success rounded-full flex items-center justify-center">
-                  <span className="text-xs text-white">✓</span>
-                </div>
-                <span className="text-sm">Create your account</span>
-                <span className="text-xs bg-success/20 text-success px-2 py-1 rounded ml-auto">Complete</span>
-              </div>
-              <div className="flex items-center space-x-3 p-3 bg-card/30 rounded-lg">
-                <div className="w-6 h-6 bg-warning rounded-full flex items-center justify-center">
-                  <span className="text-xs text-white">2</span>
-                </div>
-                <span className="text-sm">Complete your profile</span>
-                <span className="text-xs bg-warning/20 text-warning px-2 py-1 rounded ml-auto">In Progress</span>
-              </div>
-              <div className="flex items-center space-x-3 p-3 bg-card/30 rounded-lg">
-                <div className="w-6 h-6 bg-muted rounded-full flex items-center justify-center">
-                  <span className="text-xs text-muted-foreground">3</span>
-                </div>
-                <span className="text-sm">Take aptitude analysis</span>
-                <span className="text-xs bg-muted/20 text-muted-foreground px-2 py-1 rounded ml-auto">Pending</span>
-              </div>
-              <div className="flex items-center space-x-3 p-3 bg-card/30 rounded-lg">
-                <div className="w-6 h-6 bg-muted rounded-full flex items-center justify-center">
-                  <span className="text-xs text-muted-foreground">4</span>
-                </div>
-                <span className="text-sm">Explore career recommendations</span>
-                <span className="text-xs bg-muted/20 text-muted-foreground px-2 py-1 rounded ml-auto">Pending</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </main>
 
       <Footer />
