@@ -19,6 +19,7 @@ const Quiz = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [prediction, setPrediction] = useState<string | null>(null);
+  const [isSmartAnalysisDone, setIsSmartAnalysisDone] = useState(false);
 
   // 🔹 All questions
   const getQuestionsForStep = () => {
@@ -156,13 +157,111 @@ const Quiz = () => {
               </div>
               <div>
                 <h1 className="text-lg font-bold font-space-grotesk sm:text-xl">
-                  Career Assessment Quiz
+                  Assessment Quiz
                 </h1>
               </div>
             </div>
           </div>
         </div>
       </header>
+
+      {/* Smart Analysis Section */}
+      {!isSmartAnalysisDone ? (
+        <div className="text-center py-8 animate-fade-in">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+        <Star className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
+          </div>
+          <h3 className="text-xl sm:text-2xl font-bold font-space-grotesk mb-2 sm:mb-4">
+        Smart Analysis Required
+          </h3>
+          <p className="text-sm sm:text-base text-muted-foreground mb-6 max-w-md mx-auto">
+        Before we begin the personality assessment, we need to perform a smart analysis to personalize your experience.
+          </p>
+          <Button
+        className="bg-gradient-primary hover:bg-gradient-primary/90 text-white px-6 py-3 rounded-full transition-transform hover:scale-105"
+        onClick={() => navigate("/smart-analysis")}
+          >
+        <Star className="w-4 h-4 mr-2" />
+        Start Smart Analysis
+          </Button>
+        </div>
+      ) : (
+        <>
+          {/* Progress Bar */}
+          <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+        <div
+          className="bg-gradient-primary h-2 rounded-full transition-all duration-300"
+          style={{ width: `${progress}%` }}
+        />
+          </div>
+
+          {/* Question Header */}
+          <h3 className="font-semibold text-sm sm:text-base mb-2 sm:mb-4">
+        Question {globalIndex + 1} of {allQuestions.length}:
+          </h3>
+
+          {/* Question Text */}
+          <p className="mb-2 sm:mb-4 text-sm sm:text-base">
+        {currentQuestion?.text || "Loading..."}
+          </p>
+
+          {/* Options */}
+          <div className="flex flex-col space-y-2 sm:space-y-3">
+        {[
+          "Disagree",
+          "Slightly disagree",
+          "Neutral",
+          "Slightly agree",
+          "Agree",
+        ].map((option) => (
+          <Button
+            key={option}
+            variant={
+          answers[currentQuestion?.id] === option
+            ? "default"
+            : "outline"
+            }
+            className={`w-full h-auto py-1 sm:py-2 px-2 sm:px-4 text-xs sm:text-sm text-left ${answers[currentQuestion?.id] === option
+          ? "bg-gradient-primary"
+          : ""
+          } whitespace-normal break-words`}
+            onClick={() =>
+          handleAnswer(currentQuestion?.id, option)
+            }
+            disabled={!currentQuestion}
+          >
+            {option}
+          </Button>
+        ))}
+          </div>
+
+          {/* Navigation Buttons */}
+          <div className="flex justify-between mt-4">
+        <Button
+          onClick={() =>
+            currentQuestionIndex > 0
+          ? setCurrentQuestionIndex(
+            currentQuestionIndex - 1
+          )
+          : setCurrentStep(currentStep - 1)
+          }
+          disabled={currentStep === 1 && currentQuestionIndex === 0}
+          className="bg-gradient-primary hover:bg-gradient-primary/90"
+        >
+          Previous
+        </Button>
+
+        {globalIndex + 1 === allQuestions.length && (
+          <Button
+            onClick={handleSubmit}
+            className="bg-gradient-primary hover:bg-gradient-primary/90"
+          >
+            Start Quiz 2
+          </Button>
+        )}
+          </div>
+        </>
+      )}
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6">
@@ -275,8 +374,8 @@ const Quiz = () => {
                             : "outline"
                         }
                         className={`w-full h-auto py-1 sm:py-2 px-2 sm:px-4 text-xs sm:text-sm text-left ${answers[currentQuestion?.id] === option
-                            ? "bg-gradient-primary"
-                            : ""
+                          ? "bg-gradient-primary"
+                          : ""
                           } whitespace-normal break-words`}
                         onClick={() =>
                           handleAnswer(currentQuestion?.id, option)
