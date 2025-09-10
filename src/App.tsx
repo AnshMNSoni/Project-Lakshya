@@ -12,7 +12,9 @@ import SignUpPage from "./components/auth/SignUpPage";
 import Dashboard from "./components/dashboard/Dashboard";
 import ProfilePage from "./components/profile/ProfilePage";
 import Analysis from "./pages/Analysis";
-import Quiz from "./pages/Quiz";
+import Quiz from "./pages/Quiz"; // Personality Analysis
+import Quiz2 from "./pages/Quiz2"; // Physical Appearance Analysis
+import Results from "./pages/Results"; // Combined Results
 import CollegeRecommendations from "./pages/CollegeRecommendations";
 import CollegeMap from "./pages/CollegeMap";
 import About from "./pages/About";
@@ -36,13 +38,14 @@ const App = () => (
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/analysis" element={<Analysis />} />
-              <Route path="/quiz" element={<Quiz />} />
+              <Route path="/quiz" element={<Quiz />} /> {/* Personality Analysis */}
+              <Route path="/quiz2" element={<Quiz2 />} /> {/* Physical Appearance Analysis */}
+              <Route path="/results" element={<Results />} /> {/* Combined Results */}
               <Route path="/recommendations" element={<CollegeRecommendations />} />
               <Route path="/college-map" element={<CollegeMap />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/smart-analysis" element={<SmartAnalysis />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

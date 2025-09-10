@@ -9,9 +9,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ArrowLeft, BookOpen, CheckCircle, Star } from "lucide-react";
+import { useToast } from "@/hooks/use-toast"; // Added for toast notifications
 
 const Quiz = () => {
   const navigate = useNavigate();
+  const { toast } = useToast(); // Added toast hook
   const [currentStep, setCurrentStep] = useState(1);
   const [questions, setQuestions] = useState<any[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -74,11 +76,9 @@ const Quiz = () => {
     }
   };
 
-  // 🔹 Submit answers to Flask backend
+  // 🔹 Submit answers to Flask backend and navigate to Quiz2
   const handleSubmit = async () => {
-    // Count selections per option (0–4 indexes → Disagree ... Agree)
     const counts = [0, 0, 0, 0, 0];
-
     allQuestions.forEach((q) => {
       const option = answers[q.id];
       if (option) {
@@ -93,10 +93,8 @@ const Quiz = () => {
       }
     });
 
-    // Normalize counts by total number of questions answered
     const total = allQuestions.length;
     const probabilities = counts.map((c) => c / total);
-
     const payload = { answers: [probabilities] };
 
     try {
@@ -106,16 +104,38 @@ const Quiz = () => {
         body: JSON.stringify(payload),
       });
 
-      const result = await response.json();
-
-      if (result.error) {
-        alert(`Error: ${result.error}`);
-      } else {
-        setPrediction(result.career_field);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+
+      const result = await response.json();
+      if (result.error) {
+        throw new Error(result.error);
+      }
+
+      setPrediction(result.career_field);
+      localStorage.setItem("personalityAnswers", JSON.stringify(answers));
+      localStorage.setItem("personalityPrediction", result.career_field);
+
+      toast({
+        title: "Quiz 1 Complete!",
+        description: "Proceeding to Physical Appearance Analysis.",
+      });
+
+      setTimeout(() => {
+        navigate("/quiz2");
+      }, 1000);
     } catch (error) {
       console.error("❌ Error submitting answers:", error);
-      alert("Something went wrong while submitting. Please try again.");
+      toast({
+        title: "Error",
+        description: `Failed to submit answers: ${error.message}. Proceeding to Quiz 2 anyway.`,
+        variant: "destructive",
+      });
+      localStorage.setItem("personalityAnswers", JSON.stringify(answers)); // Store answers even on error
+      setTimeout(() => {
+        navigate("/quiz2");
+      }, 1000);
     }
   };
 
@@ -306,7 +326,7 @@ const Quiz = () => {
                         onClick={handleSubmit}
                         className="bg-gradient-primary hover:bg-gradient-primary/90"
                       >
-                        Submit
+                        Start Quiz 2
                       </Button>
                     )}
                   </div>
