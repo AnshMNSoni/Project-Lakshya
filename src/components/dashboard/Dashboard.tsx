@@ -296,7 +296,7 @@ const Dashboard = () => {
               {/* Desktop Menu */}
               <div className="hidden sm:flex items-center space-x-2">
                 <Link to="/profile">
-                  <Button variant="ghost" size="sm" className="hover:bg-card/50">
+                  <Button variant="ghost" size="sm" className="hover:bg-destructive/10 hover:text-destructive">
                     <User className="w-4 h-4 mr-2" />
                     Profile
                   </Button>

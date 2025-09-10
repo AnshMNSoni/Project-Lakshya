@@ -264,11 +264,8 @@ const SignInPage = () => {
 
               <div className="text-center text-xs text-muted-foreground">
                 By signing in, you agree to our{' '}
-                <Link to="/terms" className="text-primary hover:text-primary-glow">
-                  Terms of Service
-                </Link>{' '}
-                and{' '}
-                <Link to="/privacy" className="text-primary hover:text-primary-glow">
+                
+                <Link to="https://www.termsfeed.com/live/171d1911-9316-4cbe-9977-595878a79860" target="_blank" className="text-primary hover:text-primary-glow">
                   Privacy Policy
                 </Link>
               </div>

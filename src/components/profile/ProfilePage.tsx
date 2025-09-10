@@ -69,7 +69,7 @@ const ProfilePage = () => {
     if (!user) return;
 
     setIsLoading(true);
-    
+
     try {
       // Prepare academic info object
       const academic_info = {
@@ -105,9 +105,9 @@ const ProfilePage = () => {
         title: "Profile Updated",
         description: "Your profile has been successfully updated. You can now access all features!",
       });
-      
+
       setIsEditing(false);
-      
+
       // If this was first-time completion, redirect to dashboard
       if (!userProfile?.profile_completed) {
         setTimeout(() => {
@@ -166,7 +166,9 @@ const ProfilePage = () => {
       {/* Header */}
       <header className="glass-effect border-b border-border/50 sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center h-16 space-x-4">
+          <div className="flex items-center h-16 justify-between">
+
+            {/* Left: Dashboard Button */}
             <Button
               variant="ghost"
               size="sm"
@@ -176,17 +178,18 @@ const ProfilePage = () => {
               <ArrowLeft className="w-4 h-4 mr-2" />
               Dashboard
             </Button>
+
+            {/* Right: Profile Settings */}
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
                 <User className="w-4 h-4 text-white" />
               </div>
-              <div>
-                <h1 className="text-lg font-bold font-space-grotesk">Profile Settings</h1>
-              </div>
+              <h1 className="text-lg font-bold font-space-grotesk">Profile Settings</h1>
             </div>
           </div>
         </div>
       </header>
+
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
@@ -204,10 +207,10 @@ const ProfilePage = () => {
           {/* Profile Form */}
           <Card className="glass-effect shadow-card animate-slide-up">
             <CardHeader>
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
                   <CardTitle className="flex items-center space-x-2">
-                    <Sparkles className="w-5 h-5 text-primary" />
+
                     <span>Personal Information</span>
                   </CardTitle>
                   <CardDescription>
@@ -224,8 +227,8 @@ const ProfilePage = () => {
                     <Button variant="outline" onClick={handleCancel}>
                       Cancel
                     </Button>
-                    <Button 
-                      onClick={handleSave} 
+                    <Button
+                      onClick={handleSave}
                       disabled={isLoading}
                       className="bg-gradient-success hover:opacity-90"
                     >
@@ -300,8 +303,8 @@ const ProfilePage = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="gender">Gender *</Label>
-                  <Select 
-                    value={profileData.gender} 
+                  <Select
+                    value={profileData.gender}
                     onValueChange={(value) => handleInputChange('gender', value)}
                     disabled={!isEditing}
                   >
@@ -319,8 +322,8 @@ const ProfilePage = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="currentClass">Current Class *</Label>
-                  <Select 
-                    value={profileData.currentClass} 
+                  <Select
+                    value={profileData.currentClass}
                     onValueChange={(value) => handleInputChange('currentClass', value)}
                     disabled={!isEditing}
                   >
@@ -340,7 +343,7 @@ const ProfilePage = () => {
               {/* Academic Information */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold font-space-grotesk">Academic Details</h3>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="schoolName">School/Institution Name *</Label>
@@ -368,8 +371,8 @@ const ProfilePage = () => {
 
                   <div className="space-y-2 md:col-span-2">
                     <Label htmlFor="state">State *</Label>
-                    <Select 
-                      value={profileData.state} 
+                    <Select
+                      value={profileData.state}
                       onValueChange={(value) => handleInputChange('state', value)}
                       disabled={!isEditing}
                     >
@@ -401,7 +404,7 @@ const ProfilePage = () => {
               {/* Interests and Aspirations */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold font-space-grotesk">Interests & Goals</h3>
-                
+
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="interests">Areas of Interest *</Label>
@@ -440,7 +443,7 @@ const ProfilePage = () => {
             <CardHeader>
               <CardTitle>Profile Completion Status</CardTitle>
               <CardDescription>
-                {userProfile?.profile_completed 
+                {userProfile?.profile_completed
                   ? "Your profile is complete! You now have access to all features."
                   : "Complete your profile to unlock personalized career guidance"
                 }
@@ -455,9 +458,9 @@ const ProfilePage = () => {
                   </span>
                 </div>
                 <div className="w-full bg-muted/20 rounded-full h-2">
-                  <div 
-                    className="bg-gradient-primary h-2 rounded-full transition-all duration-500" 
-                    style={{ width: userProfile?.profile_completed ? '100%' : '25%' }} 
+                  <div
+                    className="bg-gradient-primary h-2 rounded-full transition-all duration-500"
+                    style={{ width: userProfile?.profile_completed ? '100%' : '25%' }}
                   />
                 </div>
                 <div className="space-y-2">

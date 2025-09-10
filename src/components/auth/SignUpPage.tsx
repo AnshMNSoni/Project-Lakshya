@@ -521,14 +521,7 @@ const SignUpPage = () => {
                           className="text-sm cursor-pointer leading-relaxed"
                         >
                           I agree to the{' '}
-                          <Link
-                            to="/terms"
-                            className="text-primary hover:text-primary-glow underline"
-                            target="_blank"
-                          >
-                            Terms and Conditions
-                          </Link>
-                          {' '}and{' '}
+                          
                           <Link
                             to="/privacy"
                             className="text-primary hover:text-primary-glow underline"

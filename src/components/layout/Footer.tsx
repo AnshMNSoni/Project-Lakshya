@@ -53,12 +53,10 @@ const Footer = () => {
               <Link to="/contact" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
                 Contact
               </Link>
-              <Link to="/privacy" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Link to="https://www.termsfeed.com/live/171d1911-9316-4cbe-9977-595878a79860" target="_blank" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
                 Privacy Policy
               </Link>
-              <Link to="/terms" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Terms of Service
-              </Link>
+            
             </nav>
           </div>
 
@@ -71,25 +69,17 @@ const Footer = () => {
                 className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 <Mail className="w-4 h-4" />
-                <span>support@lakshya.ai</span>
+                <span>anshsoni702@gmail.com</span>
               </a>
-              <a 
-                href="tel:+911234567890" 
-                className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-primary transition-colors"
-              >
-                <Phone className="w-4 h-4" />
-                <span>+91 12345 67890</span>
-              </a>
+            
             </div>
             <div className="flex space-x-2">
-              <a href="#" className="p-2 text-muted-foreground hover:text-primary transition-colors glass-effect rounded-lg">
+              <a href="https://github.com/AnshMNSoni/Project-Lakshya/" target="_blank" className="p-2 text-muted-foreground hover:text-primary transition-colors glass-effect rounded-lg">
                 <Github className="w-4 h-4" />
               </a>
-              <a href="#" className="p-2 text-muted-foreground hover:text-primary transition-colors glass-effect rounded-lg">
-                <Twitter className="w-4 h-4" />
-              </a>
-              <a href="#" className="p-2 text-muted-foreground hover:text-primary transition-colors glass-effect rounded-lg">
+              <a href="mailto:anshsoni702@gmail.com" className="p-2 text-muted-foreground hover:text-primary transition-colors glass-effect rounded-lg">
                 <Mail className="w-4 h-4" />
+
               </a>
             </div>
           </div>
