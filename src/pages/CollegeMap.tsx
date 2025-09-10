@@ -1,261 +1,361 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, MapPin, Navigation, Search, Filter, Globe, Bot } from 'lucide-react';
-import Footer from '@/components/layout/Footer';
-import { CollegeBreadcrumbWithDropdown } from '@/components/common/LakshyaBreadcrumb';
+import React, { useState, useEffect, useRef } from "react";
+import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMap } from "react-leaflet";
+import L, { LatLngTuple } from "leaflet";
+import { Card, CardContent } from "@/components/ui/card";
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip as ChartTooltip,
+  Legend,
+} from "chart.js";
+import "leaflet/dist/leaflet.css";
 
-const CollegeMap = () => {
-  const navigate = useNavigate();
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, ChartTooltip, Legend);
+
+// Fix for default marker icons
+import icon from "leaflet/dist/images/marker-icon.png";
+import iconShadow from "leaflet/dist/images/marker-shadow.png";
+
+const DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
+
+const defaultCenter: LatLngTuple = [23.0225, 72.5714]; // Ahmedabad, India
+
+interface College {
+  id: string;
+  name: string;
+  lat: number;
+  lon: number;
+  area: string;
+  nirfRanking?: string;
+}
+
+interface CollegeData {
+  placementChartData: {
+    labels: string[];
+    datasets: {
+      label: string;
+      data: number[];
+      backgroundColor: string;
+    }[];
+  };
+  preRequisites: string[];
+}
+
+const CollegeMap: React.FC = () => {
+  const [center, setCenter] = useState<LatLngTuple>(defaultCenter);
+  const [colleges, setColleges] = useState<College[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const mapRef = useRef<L.Map | null>(null);
+
+  // Detect if the device is mobile
+  const isMobile = window.innerWidth <= 768 || /Mobi|Android/i.test(navigator.userAgent);
+
+  // College data with NIRF rankings and placement info
+  const collegeDataMap: { [key: string]: { nirfRanking: string; placement: CollegeData['placementChartData']; preRequisites: string[] } } = {
+    "Nirma University": {
+      nirfRanking: "Management: 53 (Score: 53.48), Pharmacy: 32 (Score: 57.08), Law: 33 (Score: 53.70)",
+      placement: {
+        labels: ["Average Package", "Highest Package"],
+        datasets: [
+          {
+            label: "Placement (in LPA)",
+            data: [7.5, 42],
+            backgroundColor: "rgba(255, 159, 64, 0.6)",
+          },
+        ],
+      },
+      preRequisites: [
+        "Class 12 with at least 45% in PCM (40% for SC/ST)",
+        "JEE Main or GUJCET qualified",
+        "Admission through ACPC for Gujarat seats",
+      ],
+    },
+    "Pandit Deendayal Energy University": {
+      nirfRanking: "Engineering: 98 (Score: 45.97), Management: 89 (Score: 46.81)",
+      placement: {
+        labels: ["Average Package", "Highest Package"],
+        datasets: [
+          {
+            label: "Placement (in LPA)",
+            data: [7.5, 42],
+            backgroundColor: "rgba(255, 159, 64, 0.6)",
+          },
+        ],
+      },
+      preRequisites: ["Class 12 with at least 45% in PCM/PCB (40% for SC/ST)", "JEE Main mandatory"],
+    },
+    "Indian Institute of Management Ahmedabad": {
+      nirfRanking: "Management: 1 (Score: 83.29)",
+      placement: {
+        labels: ["Average Package", "Highest Package"],
+        datasets: [
+          {
+            label: "Placement (in LPA)",
+            data: [34.36, 115],
+            backgroundColor: "rgba(255, 159, 64, 0.6)",
+          },
+        ],
+      },
+      preRequisites: ["Bachelor's degree with at least 50% marks", "CAT/GMAT qualified", "Minimum age 24 for PGPX"],
+    },
+  };
+
+  // Default college data for unmapped colleges
+  const defaultCollegeData: CollegeData = {
+    placementChartData: {
+      labels: ["Average Package", "Highest Package"],
+      datasets: [
+        {
+          label: "Placement (in LPA)",
+          data: [0, 0],
+          backgroundColor: "rgba(255, 159, 64, 0.6)",
+        },
+      ],
+    },
+    preRequisites: ["No data available"],
+  };
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const userLocation: LatLngTuple = [position.coords.latitude, position.coords.longitude];
+          setCenter(userLocation);
+          setLoading(false);
+        },
+        (err) => {
+          setError("Unable to get your location. Using Ahmedabad as default.");
+          setLoading(false);
+        }
+      );
+    } else {
+      setError("Geolocation not supported by this browser.");
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchColleges = async () => {
+      if (loading) return;
+      try {
+        const query = `
+          [out:json];
+          (
+            node(around:20000,${center[0]},${center[1]})["amenity"~"university|college"];
+            way(around:20000,${center[0]},${center[1]})["amenity"~"university|college"];
+            rel(around:20000,${center[0]},${center[1]})["amenity"~"university|college"];
+          );
+          out body center;
+        `;
+        const response = await fetch("https://overpass-api.de/api/interpreter", {
+          method: "POST",
+          body: query,
+        });
+        const data = await response.json();
+
+        const collegesData: College[] = data.elements
+          .map((element: any) => {
+            const name = element.tags.name || "Unnamed College/University";
+            const collegeInfo = collegeDataMap[name];
+            return {
+              id: element.type + "/" + element.id,
+              name,
+              lat: element.lat || element.center?.lat,
+              lon: element.lon || element.center?.lon,
+              area: element.tags["addr:neighbourhood"] || element.tags["addr:suburb"] || element.tags["addr:city"] || element.tags["addr:district"] || "Unknown Area",
+              nirfRanking: collegeInfo?.nirfRanking || "Not ranked in NIRF",
+            };
+          })
+          .filter((college) => college.lat && college.lon);
+
+        setColleges(collegesData);
+      } catch (err) {
+        setError("Failed to fetch colleges from OpenStreetMap.");
+        console.error(err);
+      }
+    };
+
+    fetchColleges();
+  }, [center, loading]);
+
+  const UpdateMapCenter: React.FC<{ center: LatLngTuple }> = ({ center }) => {
+    const map = useMap();
+    useEffect(() => {
+      map.setView(center, 12);
+    }, [center, map]);
+    return null;
+  };
+
+  const getCollegeData = (name: string): CollegeData => {
+    const data = collegeDataMap[name];
+    if (!data) return defaultCollegeData;
+    
+    return {
+      placementChartData: data.placement,
+      preRequisites: data.preRequisites
+    };
+  };
+
+  // Function to generate HTML content for new tab
+  const openCollegeDetailsInNewTab = (college: College, collegeData: CollegeData) => {
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${college.name} Details</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <style>
+          body { font-family: 'Arial', sans-serif; }
+          .chart-container { width: 100%; max-width: 400px; height: 200px; }
+        </style>
+      </head>
+      <body class="bg-gray-100 p-4">
+        <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6">
+          <h3 class="text-lg font-bold mb-2">${college.name}</h3>
+          <p class="text-sm mb-1">Area: ${college.area}</p>
+          <p class="text-sm mb-4">NIRF: ${college.nirfRanking}</p>
+          <div class="chart-container">
+            <canvas id="placementChart"></canvas>
+          </div>
+          <h4 class="text-sm font-semibold mt-4 mb-2">Pre-requisite Courses/Requirements:</h4>
+          <ul class="list-disc pl-5 text-sm">
+            ${collegeData.preRequisites.map((req) => `<li>${req}</li>`).join("")}
+          </ul>
+        </div>
+        <script>
+          const ctx = document.getElementById('placementChart').getContext('2d');
+          new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: ${JSON.stringify(collegeData.placementChartData.labels)},
+              datasets: ${JSON.stringify(collegeData.placementChartData.datasets)}
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: { y: { beginAtZero: true, title: { display: true, text: 'LPA' } } },
+              plugins: { legend: { display: true }, title: { display: true, text: 'Placement Statistics' } }
+            }
+          });
+        </script>
+      </body>
+      </html>
+    `;
+    const newWindow = window.open("", "_blank");
+    newWindow?.document.write(htmlContent);
+    newWindow?.document.close();
+  };
+
+  if (loading) {
+    return <p className="text-center text-gray-600 animate-pulse">Loading map...</p>;
+  }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="glass-effect border-b border-border/50 sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center h-16 space-x-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/dashboard')}
-              className="hover:bg-card/50"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Dashboard
-            </Button>
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-success to-success-glow rounded-lg flex items-center justify-center">
-                <MapPin className="w-4 h-4 text-white" />
-              </div>
-              <div>
-                <h1 className="text-lg font-bold font-space-grotesk">College Explorer Map</h1>
-              </div>
-            </div>
-          </div>
+    <Card className="shadow-lg rounded-xl overflow-hidden">
+      <CardContent className="p-2">
+        {error && <p className="text-red-500 text-center mb-2 font-semibold text-sm">{error}</p>}
+        <div className="w-full h-[350px]">
+          <MapContainer
+            center={center}
+            zoom={12}
+            style={{ width: "100%", height: "100%" }}
+            ref={mapRef}
+          >
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            />
+            <UpdateMapCenter center={center} />
+            <Marker position={center}>
+              <Popup>You are here</Popup>
+              <Tooltip className="bg-orange-100 text-orange-800 font-semibold p-2 rounded-lg shadow-md border border-orange-300 max-w-[150px] break-words whitespace-normal text-left text-xs">
+                Your Location
+              </Tooltip>
+            </Marker>
+            {colleges.map((college) => {
+              const collegeData = getCollegeData(college.name);
+              return (
+                <Marker
+                  key={college.id}
+                  position={[college.lat, college.lon]}
+                  eventHandlers={
+                    isMobile
+                      ? {
+                          click: () => openCollegeDetailsInNewTab(college, collegeData),
+                        }
+                      : undefined
+                  }
+                >
+                  <Tooltip className="bg-orange-100 text-orange-800 font-semibold p-2 rounded-lg shadow-md border border-orange-300 max-w-[200px] break-words whitespace-normal text-left text-xs">
+                    <div className="space-y-1">
+                      <p className="text-xs font-bold">{college.name}</p>
+                      <p className="text-xs">Area: {college.area}</p>
+                      <p className="text-xs">NIRF Ranking: {college.nirfRanking}</p>
+                    </div>
+                  </Tooltip>
+                  {!isMobile && (
+                    <Popup
+                      className="p-2 min-w-[200px] max-w-[300px] bg-white rounded-lg shadow-lg"
+                      autoPan={true}
+                      keepInView={true}
+                    >
+                      <div className="flex flex-col space-y-3">
+                        <div>
+                          <h3 className="text-sm font-bold mb-2">{college.name}</h3>
+                          <p className="text-xs mb-1">Area: {college.area}</p>
+                          <p className="text-xs mb-2">NIRF: {college.nirfRanking}</p>
+                        </div>
+                        <div className="w-full h-[150px]">
+                          <Bar
+                            data={collegeData.placementChartData}
+                            options={{
+                              responsive: true,
+                              maintainAspectRatio: false,
+                              scales: {
+                                y: { beginAtZero: true, title: { display: true, text: "LPA" } },
+                              },
+                              plugins: {
+                                legend: { display: true },
+                                title: { display: true, text: "Placement Statistics" },
+                              },
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-semibold mb-2">Pre-requisite Courses/Requirements:</h4>
+                          <ul className="list-disc pl-4 text-xs space-y-1">
+                            {collegeData.preRequisites.map((req, index) => (
+                              <li key={index}>{req}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </Popup>
+                  )}
+                </Marker>
+              );
+            })}
+          </MapContainer>
         </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-8">
-          {/* Breadcrumb */}
-          <CollegeBreadcrumbWithDropdown />
-          
-          {/* Hero Section */}
-          <div className="text-center animate-slide-up">
-            <div className="w-24 h-24 bg-gradient-success rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse-glow">
-              <Globe className="w-12 h-12 text-white" />
-            </div>
-            <h2 className="text-3xl font-bold font-space-grotesk mb-4">
-              Interactive College Map
-              <span className="block text-lg text-muted-foreground font-normal mt-2">
-                Explore government colleges near you with advanced mapping
-              </span>
-            </h2>
-          </div>
-
-          {/* Coming Soon Card */}
-          <Card className="glass-effect shadow-elevated animate-slide-up relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-success/5 via-primary/5 to-accent/5" />
-            <CardHeader className="relative z-10 text-center pb-8">
-              <div className="w-16 h-16 bg-gradient-success rounded-2xl flex items-center justify-center mx-auto mb-4 animate-glow">
-                <Bot className="w-8 h-8 text-white" />
-              </div>
-              <CardTitle className="text-2xl font-space-grotesk">
-                Advanced Map Integration
-              </CardTitle>
-              <CardDescription className="text-base">
-                Interactive mapping system with real-time college data and navigation features
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="relative z-10 space-y-8">
-              {/* Map Features */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold flex items-center space-x-2">
-                    <Navigation className="w-5 h-5 text-success" />
-                    <span>Interactive Features</span>
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-card/30 rounded-lg">
-                      <span className="text-sm">Real-time Navigation</span>
-                      <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-card/30 rounded-lg">
-                      <span className="text-sm">Distance Calculations</span>
-                      <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-card/30 rounded-lg">
-                      <span className="text-sm">Zoom & Pan Controls</span>
-                      <div className="w-2 h-2 bg-accent rounded-full animate-pulse" />
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-card/30 rounded-lg">
-                      <span className="text-sm">Satellite View</span>
-                      <div className="w-2 h-2 bg-warning rounded-full animate-pulse" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold flex items-center space-x-2">
-                    <Search className="w-5 h-5 text-accent" />
-                    <span>Smart Search & Filters</span>
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-card/30 rounded-lg">
-                      <span className="text-sm">Course-based Filtering</span>
-                      <div className="w-2 h-2 bg-accent rounded-full animate-pulse" />
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-card/30 rounded-lg">
-                      <span className="text-sm">Distance Range</span>
-                      <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-card/30 rounded-lg">
-                      <span className="text-sm">Admission Status</span>
-                      <div className="w-2 h-2 bg-warning rounded-full animate-pulse" />
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-card/30 rounded-lg">
-                      <span className="text-sm">Facility Types</span>
-                      <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Map Preview Placeholder */}
-              <div className="relative">
-                <div className="aspect-video bg-gradient-to-br from-success/10 via-primary/10 to-accent/10 rounded-xl border-2 border-dashed border-success/20 flex items-center justify-center">
-                  <div className="text-center space-y-4">
-                    <Globe className="w-16 h-16 text-success mx-auto animate-float" />
-                    <div className="space-y-2">
-                      <h4 className="text-xl font-bold font-space-grotesk">Interactive Map Preview</h4>
-                      <p className="text-muted-foreground">
-                        Fully interactive map with college locations, detailed information popups, and navigation features
-                      </p>
-                    </div>
-                    
-                    {/* Mock Map Elements */}
-                    <div className="grid grid-cols-3 gap-4 mt-6 max-w-md mx-auto">
-                      <div className="flex flex-col items-center space-y-2">
-                        <div className="w-8 h-8 bg-success rounded-full flex items-center justify-center">
-                          <MapPin className="w-4 h-4 text-white" />
-                        </div>
-                        <span className="text-xs text-muted-foreground">College Markers</span>
-                      </div>
-                      <div className="flex flex-col items-center space-y-2">
-                        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                          <Navigation className="w-4 h-4 text-white" />
-                        </div>
-                        <span className="text-xs text-muted-foreground">Navigation</span>
-                      </div>
-                      <div className="flex flex-col items-center space-y-2">
-                        <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
-                          <Filter className="w-4 h-4 text-white" />
-                        </div>
-                        <span className="text-xs text-muted-foreground">Smart Filters</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Map Statistics */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div className="text-center p-4 bg-card/30 rounded-lg">
-                  <div className="text-2xl font-bold text-success">500+</div>
-                  <div className="text-sm text-muted-foreground">Mapped Colleges</div>
-                </div>
-                <div className="text-center p-4 bg-card/30 rounded-lg">
-                  <div className="text-2xl font-bold text-accent">28</div>
-                  <div className="text-sm text-muted-foreground">States</div>
-                </div>
-                <div className="text-center p-4 bg-card/30 rounded-lg">
-                  <div className="text-2xl font-bold text-warning">Real-time</div>
-                  <div className="text-sm text-muted-foreground">Updates</div>
-                </div>
-                <div className="text-center p-4 bg-card/30 rounded-lg">
-                  <div className="text-2xl font-bold text-primary">GPS</div>
-                  <div className="text-sm text-muted-foreground">Navigation</div>
-                </div>
-              </div>
-
-              {/* Call to Action */}
-              <div className="text-center p-8 bg-gradient-to-br from-success/5 via-primary/5 to-accent/5 rounded-xl border border-success/10">
-                <MapPin className="w-12 h-12 text-success mx-auto mb-4 animate-float" />
-                <h3 className="text-xl font-bold font-space-grotesk mb-2">Explore Colleges Visually</h3>
-                <p className="text-muted-foreground mb-4">
-                  Interactive map experience coming soon with advanced filtering and navigation capabilities
-                </p>
-                <Button className="bg-gradient-success hover:opacity-90">
-                  Get Notified When Ready
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-slide-up">
-            <Card className="glass-effect shadow-card">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Navigation className="w-5 h-5 text-success" />
-                  <span>Navigation Features</span>
-                </CardTitle>
-                <CardDescription>
-                  Advanced mapping and navigation capabilities
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-card/20 rounded-lg">
-                    <span className="text-sm">Turn-by-turn directions</span>
-                    <Navigation className="w-4 h-4 text-success" />
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-card/20 rounded-lg">
-                    <span className="text-sm">Public transport info</span>
-                    <Navigation className="w-4 h-4 text-success" />
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-card/20 rounded-lg">
-                    <span className="text-sm">Travel time estimates</span>
-                    <Navigation className="w-4 h-4 text-success" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="glass-effect shadow-card">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Filter className="w-5 h-5 text-accent" />
-                  <span>Smart Filtering</span>
-                </CardTitle>
-                <CardDescription>
-                  Find exactly what you're looking for
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-card/20 rounded-lg">
-                    <span className="text-sm">Course availability</span>
-                    <Filter className="w-4 h-4 text-accent" />
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-card/20 rounded-lg">
-                    <span className="text-sm">Admission deadlines</span>
-                    <Filter className="w-4 h-4 text-accent" />
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-card/20 rounded-lg">
-                    <span className="text-sm">Facility preferences</span>
-                    <Filter className="w-4 h-4 text-accent" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </main>
-      
-      <Footer />
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

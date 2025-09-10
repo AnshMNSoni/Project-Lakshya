@@ -4,12 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import CollegeMap from "./CollegeMap"; // Import the CollegeMap component
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog"; // Import Dialog components for modal
 
 const Results = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [recommendations, setRecommendations] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showMap, setShowMap] = useState(false); // State to toggle map modal visibility
 
   useEffect(() => {
     const generateRecommendations = async () => {
@@ -23,7 +26,6 @@ const Results = () => {
           throw new Error("Missing quiz data");
         }
 
-        // ✅ Use env variable, not hardcoded key
         const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY as string);
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
@@ -39,7 +41,6 @@ const Results = () => {
         const response = await result.response;
         const text = response.text().trim();
 
-        // ✅ Try parsing directly, fallback to regex if extra text is present
         let parsed: string[] = [];
         try {
           parsed = JSON.parse(text);
@@ -57,7 +58,7 @@ const Results = () => {
         }
       } catch (error) {
         console.error("Error generating recommendations:", error);
-        setRecommendations(["Freelance Writer", "UX/UI Designer", "Data Analyst", "Marketing Consultant"]); // fallback
+        setRecommendations(["Freelance Writer", "UX/UI Designer", "Data Analyst", "Marketing Consultant"]);
       } finally {
         setLoading(false);
       }
@@ -68,46 +69,64 @@ const Results = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-gray-100 flex items-center justify-center p-4 sm:p-6">
-      <Card className="w-full max-w-4xl mx-auto shadow-xl border-0 bg-white/90 backdrop-blur-sm rounded-xl overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-orange-500 to-orange-600 p-6 text-white">
-          <CardTitle className="text-2xl sm:text-3xl font-bold text-center">
+      <Card className="w-full max-w-[90vw] sm:max-w-3xl mx-auto shadow-xl border-0 bg-white/95 backdrop-blur-sm rounded-2xl overflow-hidden">
+        <CardHeader className="bg-gradient-to-r from-orange-500 to-orange-600 p-4 sm:p-6 text-white">
+          <CardTitle className="text-lg sm:text-2xl md:text-3xl font-bold text-center">
             Your Career Recommendations
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-6 sm:p-8 space-y-6">
+        <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
           {loading ? (
             <div className="text-center">
-              <p className="text-lg sm:text-xl text-gray-600 animate-pulse">
+              <p className="text-base sm:text-lg text-gray-600 animate-pulse">
                 Loading your career recommendations...
               </p>
             </div>
           ) : (
-            <div className="space-y-6">
-              <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 text-center mb-4">
+            <div className="space-y-4 sm:space-y-6">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-800 text-center">
                 Top Career Paths for You
               </h2>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {recommendations.map((career, index) => (
                   <li
                     key={index}
-                    className="bg-gradient-to-br from-orange-100 to-orange-50 p-4 rounded-lg shadow-inner text-center text-sm sm:text-base text-gray-700 hover:bg-orange-200 transition-colors duration-200"
+                    className="bg-gradient-to-br from-orange-100 to-orange-50 p-3 sm:p-4 rounded-lg shadow-inner text-center text-sm sm:text-base text-gray-700 hover:bg-orange-200 transition-colors duration-200"
                   >
                     {career}
                   </li>
                 ))}
               </ul>
-              <div className="text-center">
+              <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
                 <Button
                   onClick={() => navigate("/dashboard")}
-                  className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-3 rounded-lg text-sm sm:text-base transition-all duration-300 hover:shadow-md"
+                  className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base transition-all duration-300 hover:shadow-md w-full sm:w-auto"
                 >
                   Back to Dashboard
+                </Button>
+                <Button
+                  onClick={() => setShowMap(true)}
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base transition-all duration-300 hover:shadow-md w-full sm:w-auto"
+                >
+                  Find Colleges
                 </Button>
               </div>
             </div>
           )}
         </CardContent>
       </Card>
+      <Dialog open={showMap} onOpenChange={setShowMap}>
+        <DialogContent className="w-[95vw] sm:w-[90vw] lg:w-[70vw] xl:w-[60vw] max-w-[1200px] max-h-[110vh] p-3 sm:p-4 flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-base sm:text-lg">Colleges Near You</DialogTitle>
+            <DialogClose />
+          </DialogHeader>
+          {/* Wrapper ensures map fills remaining space but doesn't overflow */}
+          <div className="flex-1 w-full h-[60vh]">
+            <CollegeMap />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
