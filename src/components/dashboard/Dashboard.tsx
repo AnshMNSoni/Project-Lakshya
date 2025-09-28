@@ -278,9 +278,11 @@ const Dashboard = () => {
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14 sm:h-16">
             <div className="flex items-center space-x-2 sm:space-x-4">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-primary rounded-lg sm:rounded-xl flex items-center justify-center">
-                <Sparkles className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
-              </div>
+                <img 
+                src="/favicon.ico" 
+                alt="Lakshya Logo" 
+                className="w-8 h-8 sm:w-10 sm:h-10"
+                />
               <div>
                 <h1 className="text-lg sm:text-xl font-bold font-space-grotesk">Lakshya</h1>
                 <p className="hidden sm:block text-xs sm:text-sm text-muted-foreground">Smart Career Platform</p>
@@ -298,7 +300,7 @@ const Dashboard = () => {
                 <Link to="/profile">
                   <Button variant="ghost" size="sm" className="hover:bg-destructive/10 hover:text-destructive">
                     <User className="w-4 h-4 mr-2" />
-                    Profile
+                    {userProfile?.name || 'Profile'}
                   </Button>
                 </Link>
                 <Button
@@ -383,7 +385,7 @@ const Dashboard = () => {
                             onClick={() => setIsMobileMenuOpen(false)}
                           >
                             <User className="mr-3 h-5 w-5" />
-                            Profile
+                            {userProfile?.name || 'Profile'}
                           </Link>
 
                           {/* Settings Link */}

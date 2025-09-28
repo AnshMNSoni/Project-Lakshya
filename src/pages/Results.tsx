@@ -5,14 +5,35 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import CollegeMap from "./CollegeMap"; // Import the CollegeMap component
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog"; // Import Dialog components for modal
+import { X, Maximize2, Minimize2 } from "lucide-react"; // Import icons for fullscreen controls
 
 const Results = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [recommendations, setRecommendations] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showMap, setShowMap] = useState(false); // State to toggle map modal visibility
+  const [showMap, setShowMap] = useState(false); // State to toggle map visibility
+  const [isFullScreen, setIsFullScreen] = useState(false); // State to control full-screen mode
+  const [mapLoading, setMapLoading] = useState(false); // State for map loading
+
+  // Handle escape key for full-screen map
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showMap) {
+        setShowMap(false);
+      }
+    };
+
+    if (showMap) {
+      document.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden'; // Prevent background scroll
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset'; // Restore scroll
+    };
+  }, [showMap]);
 
   useEffect(() => {
     const generateRecommendations = async () => {
@@ -68,7 +89,7 @@ const Results = () => {
   }, [toast]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-gray-100 flex items-center justify-center p-4 sm:p-6">
+    <div className={`min-h-screen bg-gradient-to-br from-gray-100 via-white to-gray-100 flex items-center justify-center p-4 sm:p-6 ${showMap ? 'overflow-hidden' : ''}`}>
       <Card className="w-full max-w-[90vw] sm:max-w-3xl mx-auto shadow-xl border-0 bg-white/95 backdrop-blur-sm rounded-2xl overflow-hidden">
         <CardHeader className="bg-gradient-to-r from-orange-500 to-orange-600 p-4 sm:p-6 text-white">
           <CardTitle className="text-lg sm:text-2xl md:text-3xl font-bold text-center">
@@ -105,28 +126,77 @@ const Results = () => {
                   Back to Dashboard
                 </Button>
                 <Button
-                  onClick={() => setShowMap(true)}
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base transition-all duration-300 hover:shadow-md w-full sm:w-auto"
+                  onClick={() => {
+                    setMapLoading(true);
+                    setTimeout(() => {
+                      setShowMap(true);
+                      setMapLoading(false);
+                    }, 300);
+                  }}
+                  disabled={mapLoading}
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base transition-all duration-300 hover:shadow-md w-full sm:w-auto flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Find Colleges
+                  {mapLoading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Loading Map...
+                    </>
+                  ) : (
+                    <>
+                      <Maximize2 className="w-4 h-4" />
+                      Find Colleges
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
           )}
         </CardContent>
       </Card>
-      <Dialog open={showMap} onOpenChange={setShowMap}>
-        <DialogContent className="w-[95vw] sm:w-[90vw] lg:w-[70vw] xl:w-[60vw] max-w-[1200px] max-h-[110vh] p-3 sm:p-4 flex flex-col">
-          <DialogHeader>
-            <DialogTitle className="text-base sm:text-lg">Colleges Near You</DialogTitle>
-            <DialogClose />
-          </DialogHeader>
-          {/* Wrapper ensures map fills remaining space but doesn't overflow */}
-          <div className="flex-1 w-full h-[60vh]">
-            <CollegeMap />
+
+      {/* Full Screen Map Overlay */}
+      {showMap && (
+        <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm animate-in fade-in duration-300 pointer-events-auto">
+          {/* Header Controls */}
+          <div className="absolute top-0 left-0 right-0 z-[70] bg-gradient-to-r from-orange-500/95 to-orange-600/95 backdrop-blur-md border-b border-orange-300/30 shadow-lg">
+            <div className="flex items-center justify-between p-4 max-w-7xl mx-auto relative z-[71]">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-white/20 rounded-lg">
+                  <Maximize2 className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-white">College Explorer</h2>
+                  <p className="text-xs text-orange-100">• Find colleges near you</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Close button clicked'); // Debug log
+                    setShowMap(false);
+                  }}
+                  className="text-white hover:bg-red-500/30 p-2 rounded-lg transition-colors cursor-pointer border-none bg-transparent z-50 relative"
+                  title="Close Full Screen (ESC)"
+                  type="button"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
           </div>
-        </DialogContent>
-      </Dialog>
+
+          {/* Map Container */}
+          <div className="absolute inset-0 pt-20 animate-in slide-in-from-bottom duration-500">
+            <div className="w-full h-full rounded-t-xl overflow-hidden shadow-2xl">
+              <CollegeMap />
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

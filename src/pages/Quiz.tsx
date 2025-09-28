@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ArrowLeft, ArrowRight, BookOpen, CheckCircle, Star } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, CheckCircle, Star, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast"; // Added for toast notifications
 
 const Quiz = () => {
@@ -20,6 +20,7 @@ const Quiz = () => {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [prediction, setPrediction] = useState<string | null>(null);
   const [isSmartAnalysisDone, setIsSmartAnalysisDone] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 🔹 All questions
   const getQuestionsForStep = () => {
@@ -78,7 +79,7 @@ const Quiz = () => {
       toast({
         title: "Wait!",
         description: "Please select an option before proceeding.",
-        variant: "warning", // Assuming you have a 'warning' variant or similar
+        variant: "default",
       });
       return;
     }
@@ -96,6 +97,7 @@ const Quiz = () => {
   // ... (rest of handleSubmit)
   // 🔹 Submit answers to Flask backend and navigate to Quiz2
   const handleSubmit = async () => {
+    setIsSubmitting(true);
     const counts = [0, 0, 0, 0, 0];
     allQuestions.forEach((q) => {
       const option = answers[q.id];
@@ -150,6 +152,8 @@ const Quiz = () => {
       setTimeout(() => {
         navigate("/quiz2");
       }, 1000);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -285,10 +289,17 @@ const Quiz = () => {
             ) : (
               <Button
                 onClick={handleSubmit}
-                disabled={!currentQuestion || !answers[currentQuestion?.id]} // Should also be disabled on final question if no answer
+                disabled={!currentQuestion || !answers[currentQuestion?.id] || isSubmitting} // Should also be disabled on final question if no answer or while submitting
                 className="bg-green-600 hover:bg-green-700 text-white font-semibold transition-transform duration-150 ease-in-out shadow-lg shadow-green-600/50" // Distinct "Submit/Success" color
               >
-                Start Quiz 2
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  "Next Quiz"
+                )}
               </Button>
             )}
           </div>
@@ -452,10 +463,17 @@ const Quiz = () => {
                     ) : (
                       <Button
                         onClick={handleSubmit}
-                        disabled={!currentQuestion || !answers[currentQuestion?.id]} // Should also be disabled on final question if no answer
+                        disabled={!currentQuestion || !answers[currentQuestion?.id] || isSubmitting} // Should also be disabled on final question if no answer or while submitting
                         className="bg-green-600 hover:bg-green-700 text-white font-semibold transition-transform duration-150 ease-in-out shadow-lg shadow-green-600/50" // Distinct "Submit/Success" color
                       >
-                        Start Quiz 2
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Loading...
+                          </>
+                        ) : (
+                          "Next Quiz"
+                        )}
                       </Button>
                     )}
                   </div>

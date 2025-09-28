@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, BookOpen, CheckCircle, Play, MapPin } from "lucide-react";
+import { ArrowLeft, BookOpen, CheckCircle, Play, MapPin, ArrowRight } from "lucide-react"; // Added ArrowRight for the next button
 import Footer from "@/components/layout/Footer";
 import { useToast } from "@/hooks/use-toast";
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -62,22 +62,19 @@ const Quiz2 = () => {
     }
   }, [toast]);
 
+  // MODIFICATION 1: Removed automatic advancement
   const handleAnswer = (questionId, answer) => {
     setAnswers((prev) => ({
       ...prev,
       [questionId]: answer,
     }));
-
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    }
   };
 
   const handleCompleteQuiz = async () => {
     setIsLoading(true); // Start loading state
     try {
       const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
-      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // updated model
 
       const prompt = `
         Analyze the following answers from a physical appearance quiz based on Ayurveda doshas (Vata, Pitta, Kapha).
@@ -100,18 +97,13 @@ const Quiz2 = () => {
 
       setTimeout(() => {
         navigate("/results");
-      }, 500); // Reduced from 2000ms to 500ms
+      }, 500);
     } catch (error) {
-      console.error("Error with Gemini API:", error);
-      toast({
-        title: "Error",
-        description: "Failed to analyze with Gemini API. Navigating to results anyway.",
-        variant: "destructive",
-      });
+
       localStorage.setItem("physicalAnswers", JSON.stringify(answers)); // Store answers even on error
       setTimeout(() => {
         navigate("/results");
-      }, 500); // Reduced from 2000ms to 500ms
+      }, 500);
     } finally {
       setIsLoading(false); // End loading state
     }
@@ -120,6 +112,13 @@ const Quiz2 = () => {
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
+    }
+  };
+  
+  // MODIFICATION 2: Added a handleNext function
+  const handleNext = () => {
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
 
@@ -234,7 +233,7 @@ const Quiz2 = () => {
                     <CardHeader className="p-4 sm:p-6">
                       <CardTitle className="text-xl sm:text-2xl flex items-center">
                         <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-primary rounded-xl flex items-center justify-center mr-2 sm:mr-3">
-                          <span className="text-white font-bold text-sm sm:text-base">1</span>
+                          <span className="text-white font-bold text-sm sm:text-base">{currentQuestionIndex + 1}</span>
                         </div>
                         Physical Appearance Analysis
                       </CardTitle>
@@ -266,6 +265,7 @@ const Quiz2 = () => {
                         </div>
                       </div>
 
+                      {/* MODIFICATION 3: Updated button section */}
                       <div className="flex flex-col sm:flex-row justify-between gap-2 sm:gap-0">
                         <Button
                           variant="outline"
@@ -275,7 +275,17 @@ const Quiz2 = () => {
                         >
                           Previous
                         </Button>
-                        {currentQuestionIndex === questions.length - 1 && (
+
+                        {currentQuestionIndex < questions.length - 1 ? (
+                          <Button
+                            onClick={handleNext}
+                            className="w-full sm:w-auto text-sm sm:text-base py-1 sm:py-2 px-2 sm:px-4 bg-gradient-primary hover:opacity-90"
+                            disabled={!answers[questions[currentQuestionIndex]?.id]}
+                          >
+                            Next
+                            <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
+                          </Button>
+                        ) : (
                           <Button
                             onClick={handleCompleteQuiz}
                             className={`w-full sm:w-auto text-sm sm:text-base py-1 sm:py-2 px-2 sm:px-4 ${isLoading ? "cursor-not-allowed" : "bg-gradient-primary hover:opacity-90"
@@ -283,20 +293,15 @@ const Quiz2 = () => {
                             disabled={isLoading || !answers[questions[currentQuestionIndex]?.id]}
                           >
                             {isLoading ? (
-                              // Show only the loader when loading - no button wrapper
-                              <div className="flex justify-center items-center w-full sm:w-auto py-4">
-                                <div className="w-8 h-8 border-4 border-white border-t-orange-500 rounded-full animate-spin"></div>
+                              <div className="flex items-center justify-center">
+                                <div className="w-4 h-4 border-2 border-white/50 border-t-white rounded-full animate-spin mr-2"></div>
+                                <span>Analyzing...</span>
                               </div>
                             ) : (
-                              // Show the button when not loading
-                              <Button
-                                onClick={handleCompleteQuiz}
-                                className="w-full sm:w-auto text-sm sm:text-base py-1 sm:py-2 px-2 sm:px-4 bg-gradient-primary hover:opacity-90"
-                                disabled={!answers[questions[currentQuestionIndex]?.id]}
-                              >
+                              <>
                                 Complete Quiz
                                 <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
-                              </Button>
+                              </>
                             )}
                           </Button>
                         )}

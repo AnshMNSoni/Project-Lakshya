@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMap } from "react-l
 import L, { LatLngTuple } from "leaflet";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, MapPin, Sparkles } from "lucide-react";
+import { ArrowLeft, MapPin, Sparkles, BookOpen, Search, Filter, MoreHorizontal } from "lucide-react";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -64,9 +64,19 @@ const CollegeMap: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const mapRef = useRef<L.Map | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Detect if the device is mobile
-  const isMobile = window.innerWidth <= 768 || /Mobi|Android/i.test(navigator.userAgent);
+  // Detect if the device is mobile and update on resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768 || /Mobi|Android/i.test(navigator.userAgent));
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // College data with NIRF rankings and placement info
   const collegeDataMap: { [key: string]: { nirfRanking: string; placement: CollegeData['placementChartData']; preRequisites: string[] } } = {
@@ -230,18 +240,44 @@ const CollegeMap: React.FC = () => {
           .chart-container { width: 100%; max-width: 400px; height: 200px; }
         </style>
       </head>
-      <body class="bg-gray-100 p-4">
-        <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6">
-          <h3 class="text-lg font-bold mb-2">${college.name}</h3>
-          <p class="text-sm mb-1">Area: ${college.area}</p>
-          <p class="text-sm mb-4">NIRF: ${college.nirfRanking}</p>
-          <div class="chart-container">
-            <canvas id="placementChart"></canvas>
+      <body class="bg-gray-100 p-2 sm:p-4">
+        <div class="mx-auto bg-white rounded-lg shadow-lg p-4 sm:p-6">
+          <!-- Header with close button -->
+          <div class="flex justify-between items-start mb-4">
+            <h3 class="text-lg sm:text-xl font-bold text-gray-800">${college.name}</h3>
+            <button onclick="window.close()" class="text-gray-500 hover:text-gray-700 text-xl font-bold">&times;</button>
           </div>
-          <h4 class="text-sm font-semibold mt-4 mb-2">Pre-requisite Courses/Requirements:</h4>
-          <ul class="list-disc pl-5 text-sm">
-            ${collegeData.preRequisites.map((req) => `<li>${req}</li>`).join("")}
-          </ul>
+          
+          <!-- College Info -->
+          <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+            <p class="text-sm mb-2"><strong>Area:</strong> ${college.area}</p>
+            <p class="text-sm mb-2"><strong>NIRF Ranking:</strong> ${college.nirfRanking}</p>
+          </div>
+          
+          <!-- Chart -->
+          <div class="mb-6">
+            <h4 class="text-base font-semibold mb-3 text-gray-800">Placement Statistics</h4>
+            <div class="chart-container bg-white p-2 rounded border">
+              <canvas id="placementChart"></canvas>
+            </div>
+          </div>
+          
+          <!-- Prerequisites -->
+          <div class="mb-4">
+            <h4 class="text-base font-semibold mb-3 text-gray-800">Pre-requisite Courses/Requirements:</h4>
+            <div class="bg-blue-50 p-3 rounded-lg">
+              <ul class="list-disc pl-5 text-sm space-y-1">
+                ${collegeData.preRequisites.map((req) => `<li class="text-gray-700">${req}</li>`).join("")}
+              </ul>
+            </div>
+          </div>
+          
+          <!-- Mobile-friendly close button -->
+          <div class="text-center mt-6">
+            <button onclick="window.close()" class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-lg font-medium">
+              Close Window
+            </button>
+          </div>
         </div>
         <script>
           const ctx = document.getElementById('placementChart').getContext('2d');
@@ -284,7 +320,7 @@ const CollegeMap: React.FC = () => {
       <header className="glass-effect border-b border-border/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14 sm:h-16">
-            <div className="flex items-center">
+            <div className="flex items-center space-x-2">
               <Button
                 variant="ghost"
                 size="sm"
@@ -292,7 +328,7 @@ const CollegeMap: React.FC = () => {
                 className="p-2 sm:px-3"
               >
                 <ArrowLeft className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">Back to Dashboard</span>
+                <span className="hidden sm:inline">Dashboard</span>
               </Button>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">
@@ -316,7 +352,12 @@ const CollegeMap: React.FC = () => {
             <p className="font-semibold text-sm">{error}</p>
           </div>
         )}
-        <div className="w-full" style={{ height: 'calc(100vh - 64px)' }}>
+        <div 
+          className="w-full" 
+          style={{ 
+            height: isMobile ? '70vh' : 'calc(100vh - 64px)' 
+          }}
+        >
           <MapContainer
             center={center}
             zoom={12}
@@ -348,48 +389,100 @@ const CollegeMap: React.FC = () => {
                       : undefined
                   }
                 >
-                  <Tooltip className="bg-orange-100 text-orange-800 font-semibold p-2 rounded-lg shadow-md border border-orange-300 max-w-[200px] break-words whitespace-normal text-left text-xs">
+                  <Tooltip className={`bg-orange-100 text-orange-800 font-semibold p-2 rounded-lg shadow-md border border-orange-300 break-words whitespace-normal text-left text-xs ${isMobile ? 'max-w-[150px]' : 'max-w-[200px]'}`}>
                     <div className="space-y-1">
                       <p className="text-xs font-bold">{college.name}</p>
                       <p className="text-xs">Area: {college.area}</p>
-                      <p className="text-xs">NIRF Ranking: {college.nirfRanking}</p>
+                      <p className="text-xs">NIRF: {college.nirfRanking.length > 50 && isMobile ? college.nirfRanking.substring(0, 50) + '...' : college.nirfRanking}</p>
+                      {isMobile && (
+                        <p className="text-xs text-orange-600 font-medium">Tap for details</p>
+                      )}
                     </div>
                   </Tooltip>
                   {!isMobile && (
                     <Popup
-                      className="p-2 min-w-[200px] max-w-[300px] bg-white rounded-lg shadow-lg"
+                      className="min-w-[350px] max-w-[400px]"
                       autoPan={true}
                       keepInView={true}
                     >
-                      <div className="flex flex-col space-y-3">
-                        <div>
-                          <h3 className="text-sm font-bold mb-2">{college.name}</h3>
-                          <p className="text-xs mb-1">Area: {college.area}</p>
-                          <p className="text-xs mb-2">NIRF: {college.nirfRanking}</p>
+                      <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl p-4 shadow-xl border border-gray-200">
+                        {/* Header */}
+                        <div className="border-b border-gray-200 pb-3 mb-3">
+                          <h3 className="text-lg font-bold text-gray-800 mb-1">{college.name}</h3>
+                          <div className="flex items-center text-sm text-gray-600">
+                            <MapPin className="w-4 h-4 mr-1" />
+                            <span>{college.area}</span>
+                          </div>
                         </div>
-                        <div className="w-full h-[150px]">
-                          <Bar
-                            data={collegeData.placementChartData}
-                            options={{
-                              responsive: true,
-                              maintainAspectRatio: false,
-                              scales: {
-                                y: { beginAtZero: true, title: { display: true, text: "LPA" } },
-                              },
-                              plugins: {
-                                legend: { display: true },
-                                title: { display: true, text: "Placement Statistics" },
-                              },
-                            }}
-                          />
+
+                        {/* College Info Cards */}
+                        <div className="space-y-3 mb-4">
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                            <h4 className="text-sm font-semibold text-blue-800 mb-1">NIRF Ranking</h4>
+                            <p className="text-xs text-blue-700">{college.nirfRanking}</p>
+                          </div>
                         </div>
-                        <div>
-                          <h4 className="text-xs font-semibold mb-2">Pre-requisite Courses/Requirements:</h4>
-                          <ul className="list-disc pl-4 text-xs space-y-1">
-                            {collegeData.preRequisites.map((req, index) => (
-                              <li key={index}>{req}</li>
+
+                        {/* Placement Chart */}
+                        <div className="bg-white border border-gray-200 rounded-lg p-3 mb-3">
+                          <h4 className="text-sm font-semibold text-gray-800 mb-2 flex items-center">
+                            <Sparkles className="w-4 h-4 mr-1 text-orange-500" />
+                            Placement Statistics
+                          </h4>
+                          <div className="w-full h-[120px]">
+                            <Bar
+                              data={collegeData.placementChartData}
+                              options={{
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                  y: { 
+                                    beginAtZero: true, 
+                                    title: { display: true, text: "LPA" },
+                                    grid: { color: 'rgba(0,0,0,0.1)' }
+                                  },
+                                  x: {
+                                    grid: { display: false }
+                                  }
+                                },
+                                plugins: {
+                                  legend: { display: false },
+                                  title: { display: false },
+                                },
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Prerequisites */}
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                          <h4 className="text-sm font-semibold text-green-800 mb-2 flex items-center">
+                            <BookOpen className="w-4 h-4 mr-1" />
+                            Requirements
+                          </h4>
+                          <ul className="text-xs text-green-700 space-y-1">
+                            {collegeData.preRequisites.slice(0, 3).map((req, index) => (
+                              <li key={index} className="flex items-start">
+                                <span className="w-1 h-1 bg-green-600 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                                <span>{req}</span>
+                              </li>
                             ))}
                           </ul>
+                          {collegeData.preRequisites.length > 3 && (
+                            <p className="text-xs text-green-600 mt-2 font-medium">
+                              +{collegeData.preRequisites.length - 3} more requirements
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Action Button */}
+                        <div className="mt-4 pt-3 border-t border-gray-200">
+                          <button 
+                            onClick={() => openCollegeDetailsInNewTab(college, collegeData)}
+                            className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
+                          >
+                            View Full Details
+                          </button>
                         </div>
                       </div>
                     </Popup>
@@ -399,6 +492,25 @@ const CollegeMap: React.FC = () => {
             })}
           </MapContainer>
         </div>
+        
+        {/* Mobile Instructions */}
+        {isMobile && (
+          <div className="bg-gradient-to-r from-orange-50 to-amber-50 border-t border-orange-200 p-4">
+            <div className="max-w-sm mx-auto text-center">
+              <h3 className="text-sm font-semibold text-orange-800 mb-2">How to Use</h3>
+              <div className="space-y-2 text-xs text-orange-700">
+                <p className="flex items-center justify-center gap-2">
+                  <MapPin className="w-3 h-3" />
+                  Tap on college markers to view details
+                </p>
+                <p className="flex items-center justify-center gap-2">
+                  <ArrowLeft className="w-3 h-3" />
+                  Use the back button to return to dashboard
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
