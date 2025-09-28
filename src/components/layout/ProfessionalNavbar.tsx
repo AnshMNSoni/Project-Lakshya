@@ -51,7 +51,7 @@ const ProfessionalNavbar = ({ isAuthenticated = false, hideAuthOptions = false }
 
   const features = [
     {
-      title: 'Smart Analysis',
+      title: 'Technical Analysis',
       description: 'AI-powered personality and career assessment',
       href: '/smart-analysis',
       icon: Brain,

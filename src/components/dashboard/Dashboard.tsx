@@ -119,7 +119,7 @@ const Dashboard = () => {
       ),
     },
     {
-      title: "Smart Analysis",
+      title: "Technical Analysis",
       content: (
         <div>
           <p className="mb-6 text-sm font-normal text-foreground md:text-base dark:text-foreground">
@@ -149,7 +149,7 @@ const Dashboard = () => {
       ),
     },
     {
-      title: "Quiz Analysis",
+      title: "Advance Analysis",
       content: (
         <div>
           <p className="mb-6 text-sm font-normal text-foreground md:text-base dark:text-foreground">
@@ -332,7 +332,7 @@ const Dashboard = () => {
                       <div className="flex-1 py-6">
                         <div className="space-y-2">
 
-                          {/* Smart Analysis - Only show if profile completed */}
+                          {/* Technical Analysis - Only show if profile completed */}
                           {canShowSmartAnalysis && (
                             <Link
                               to="/smart-analysis"
@@ -340,11 +340,11 @@ const Dashboard = () => {
                               onClick={() => setIsMobileMenuOpen(false)}
                             >
                               <Brain className="mr-3 h-5 w-5" />
-                              Smart Analysis
+                              Technical Analysis
                             </Link>
                           )}
 
-                          {/* Career Quiz - Only show if profile completed but smart analysis not done */}
+                          {/* Career Quiz - Only show if profile completed but Technical Analysis not done */}
                           {canShowQuiz && (
                             <Link
                               to="/quiz"
@@ -512,7 +512,7 @@ const Dashboard = () => {
               </div>
               <p className="text-xs text-muted-foreground mt-1">
                 {userProfile?.smart_analysis_completed
-                  ? 'Smart analysis completed!'
+                  ? 'Technical Analysis completed!'
                   : 'Complete aptitude analysis to unlock recommendations'
                 }
               </p>
@@ -554,7 +554,7 @@ const Dashboard = () => {
                 {isFirstLogin
                   ? 'Complete your profile setup'
                   : userProfile?.profile_completed && !userProfile?.smart_analysis_completed
-                    ? 'Take smart analysis and quiz'
+                    ? 'Take Technical Analysis and quiz'
                     : 'All tasks completed!'
                 }
               </p>
@@ -631,7 +631,7 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Connector and Smart Analysis Card */}
+          {/* Connector and Technical Analysis Card */}
           {canShowSmartAnalysis && (
             <>
               <div className="flex justify-center">
@@ -651,7 +651,7 @@ const Dashboard = () => {
                     </div>
                     <div className="flex-1">
                       <CardTitle className="text-xl font-bold bg-gradient-to-r from-gray-900 to-green-600 bg-clip-text text-transparent dark:from-white dark:to-green-400">
-                        Smart Analysis
+                        Technical Analysis
                       </CardTitle>
                       <CardDescription className="text-gray-600 dark:text-gray-300 mt-1">
                         AI-powered aptitude and personality assessment

@@ -35,11 +35,23 @@ const ProfilePage = () => {
 
   // Load profile data on component mount
   useEffect(() => {
-    if (userProfile) {
+    if (userProfile && user) {
+      // Check if mobile is missing but available in user metadata
+      const phoneFromMetadata = user.user_metadata?.phone;
+      const shouldUpdateMobile = !userProfile.mobile && phoneFromMetadata;
+
+      // Debug logging
+      console.log('Profile Debug:', {
+        profileMobile: userProfile.mobile,
+        metadataPhone: phoneFromMetadata,
+        shouldUpdate: shouldUpdateMobile,
+        userMetadata: user.user_metadata
+      });
+
       setProfileData({
         fullName: userProfile.name || '',
         email: user?.email || '',
-        mobile: userProfile.mobile || '',
+        mobile: userProfile.mobile || phoneFromMetadata || '',
         dateOfBirth: userProfile.academic_info?.dateOfBirth || '',
         gender: userProfile.academic_info?.gender || '',
         currentClass: userProfile.academic_info?.currentClass || '',
@@ -51,12 +63,84 @@ const ProfilePage = () => {
       });
       setDataLoading(false);
 
+      // Auto-update profile with mobile from metadata if missing
+      if (shouldUpdateMobile) {
+        updateMobileFromMetadata(phoneFromMetadata);
+      }
+
       // Auto-enable editing for first-time users
       if (!userProfile.profile_completed) {
         setIsEditing(true);
       }
     }
   }, [userProfile, user]);
+
+  // Function to update mobile number from user metadata
+  const updateMobileFromMetadata = async (phone: string) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ mobile: phone })
+        .eq('user_id', user!.id);
+
+      if (error) {
+        console.error('Error updating mobile from metadata:', error);
+        toast({
+          variant: "destructive",
+          title: "Update Failed",
+          description: "Could not update mobile number from sign-up data.",
+        });
+      } else {
+        // Refresh profile to get updated data
+        await refreshProfile();
+        console.log('Mobile number updated from sign-up data');
+        toast({
+          title: "Mobile Updated",
+          description: "Mobile number has been retrieved from your sign-up data.",
+        });
+      }
+    } catch (error) {
+      console.error('Error updating mobile from metadata:', error);
+    }
+  };
+
+  // Function to manually fetch mobile from user metadata
+  const fetchMobileFromMetadata = async () => {
+    if (!user) return;
+
+    try {
+      // Get fresh user data
+      const { data: { user: freshUser }, error } = await supabase.auth.getUser();
+      
+      if (error) {
+        throw error;
+      }
+
+      const phoneFromMetadata = freshUser?.user_metadata?.phone;
+      
+      if (phoneFromMetadata && !userProfile?.mobile) {
+        await updateMobileFromMetadata(phoneFromMetadata);
+      } else if (!phoneFromMetadata) {
+        toast({
+          variant: "destructive",
+          title: "No Mobile Found",
+          description: "No mobile number found in your sign-up data. Please enter it manually.",
+        });
+      } else {
+        toast({
+          title: "Already Updated",
+          description: "Mobile number is already available in your profile.",
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching mobile from metadata:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not retrieve mobile number from sign-up data.",
+      });
+    }
+  };
 
   const handleInputChange = (field: string, value: string) => {
     setProfileData({
@@ -282,10 +366,24 @@ const ProfilePage = () => {
                     value={profileData.mobile}
                     onChange={(e) => handleInputChange('mobile', e.target.value)}
                     disabled={!isEditing}
+                    placeholder="Enter your 10-digit mobile number"
                     className="bg-card/50 border-border/50 focus:border-primary transition-colors"
                     maxLength={10}
                     required
                   />
+                  {!profileData.mobile && !isEditing && (
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-muted-foreground">Mobile number not found</p>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={fetchMobileFromMetadata}
+                        className="text-xs h-6 px-2"
+                      >
+                        Fetch from Sign-up
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -483,7 +581,7 @@ const ProfilePage = () => {
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span>Smart Analysis</span>
+                    <span>Technical Analysis</span>
                     <span className={userProfile?.smart_analysis_completed ? "text-success" : "text-muted-foreground"}>
                       {userProfile?.smart_analysis_completed ? "✓ Complete" : "◦ Available after profile completion"}
                     </span>

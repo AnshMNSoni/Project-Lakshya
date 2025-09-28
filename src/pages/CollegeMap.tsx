@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMap } from "react-leaflet";
 import L, { LatLngTuple } from "leaflet";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, MapPin, Sparkles } from "lucide-react";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -55,6 +58,7 @@ interface CollegeData {
 }
 
 const CollegeMap: React.FC = () => {
+  const navigate = useNavigate();
   const [center, setCenter] = useState<LatLngTuple>(defaultCenter);
   const [colleges, setColleges] = useState<College[]>([]);
   const [loading, setLoading] = useState(true);
@@ -264,14 +268,55 @@ const CollegeMap: React.FC = () => {
   };
 
   if (loading) {
-    return <p className="text-center text-gray-600 animate-pulse">Loading map...</p>;
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading map...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <Card className="shadow-lg rounded-xl overflow-hidden">
-      <CardContent className="p-2">
-        {error && <p className="text-red-500 text-center mb-2 font-semibold text-sm">{error}</p>}
-        <div className="w-full h-[350px]">
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="glass-effect border-b border-border/50 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-14 sm:h-16">
+            <div className="flex items-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/dashboard')}
+                className="p-2 sm:px-3"
+              >
+                <ArrowLeft className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Back to Dashboard</span>
+              </Button>
+            </div>
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
+                  <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                </div>
+                <span className="text-lg sm:text-xl font-bold font-space-grotesk gradient-text">
+                  College Explorer
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="w-full">
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 text-center">
+            <p className="font-semibold text-sm">{error}</p>
+          </div>
+        )}
+        <div className="w-full" style={{ height: 'calc(100vh - 64px)' }}>
           <MapContainer
             center={center}
             zoom={12}
@@ -354,8 +399,8 @@ const CollegeMap: React.FC = () => {
             })}
           </MapContainer>
         </div>
-      </CardContent>
-    </Card>
+      </main>
+    </div>
   );
 };
 

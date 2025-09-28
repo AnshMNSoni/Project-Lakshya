@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import ReCAPTCHA from 'react-google-recaptcha';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Eye, EyeOff, Mail, Lock, User, Phone, Shield, Sparkles, Check, X, RefreshCw } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Phone, Check, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import heroImage from '@/assets/hero-education.jpg';
 import ProfessionalNavbar from '@/components/layout/ProfessionalNavbar';
 
 const SignUpPage = () => {
@@ -17,8 +17,6 @@ const SignUpPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [robotVerified, setRobotVerified] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [captchaCode, setCaptchaCode] = useState('');
-  const [userCaptchaInput, setUserCaptchaInput] = useState('');
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -28,40 +26,14 @@ const SignUpPage = () => {
   });
   const { toast } = useToast();
   const navigate = useNavigate();
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
-  // Generate random captcha code
-  const generateCaptcha = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let result = '';
-    for (let i = 0; i < 6; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    setCaptchaCode(result);
-    setUserCaptchaInput('');
-    setRobotVerified(false);
-  };
-
-  // Initialize captcha on component mount
-  React.useEffect(() => {
-    generateCaptcha();
-  }, []);
-
-  // Verify captcha
-  const verifyCaptcha = () => {
-    if (userCaptchaInput.toUpperCase() === captchaCode) {
+  // New handler for reCAPTCHA changes
+  const handleRecaptchaChange = (token: string | null) => {
+    if (token) {
       setRobotVerified(true);
-      toast({
-        title: "Verification Successful",
-        description: "Human verification completed!",
-      });
     } else {
       setRobotVerified(false);
-      toast({
-        variant: "destructive",
-        title: "Verification Failed",
-        description: "Please enter the correct captcha code",
-      });
-      generateCaptcha();
     }
   };
 
@@ -74,7 +46,6 @@ const SignUpPage = () => {
       number: /\d/.test(password),
       special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
     };
-
     const strength = Object.values(criteria).filter(Boolean).length;
     return { criteria, strength, isStrong: strength >= 4 };
   };
@@ -91,11 +62,16 @@ const SignUpPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const resetRecaptcha = () => {
+      recaptchaRef.current?.reset();
+      setRobotVerified(false);
+    }
+
     if (!robotVerified) {
       toast({
         variant: "destructive",
         title: "Verification Required",
-        description: "Please complete the Human verification",
+        description: "Please complete the 'I'm not a robot' check.",
       });
       return;
     }
@@ -106,6 +82,7 @@ const SignUpPage = () => {
         title: "Terms Required",
         description: "Please accept the Terms and Conditions to continue",
       });
+      resetRecaptcha();
       return;
     }
 
@@ -115,6 +92,7 @@ const SignUpPage = () => {
         title: "Weak Password",
         description: "Please create a stronger password meeting all criteria",
       });
+      resetRecaptcha();
       return;
     }
 
@@ -124,6 +102,7 @@ const SignUpPage = () => {
         title: "Invalid Mobile Number",
         description: "Please enter a valid 10-digit mobile number",
       });
+      resetRecaptcha();
       return;
     }
 
@@ -133,6 +112,7 @@ const SignUpPage = () => {
         title: "Password Mismatch",
         description: "Passwords do not match",
       });
+      resetRecaptcha();
       return;
     }
 
@@ -157,6 +137,7 @@ const SignUpPage = () => {
           title: "Sign Up Failed",
           description: error.message,
         });
+        resetRecaptcha();
       } else {
         toast({
           title: "Account Created Successfully!",
@@ -170,6 +151,7 @@ const SignUpPage = () => {
         title: "Sign Up Failed",
         description: "An unexpected error occurred. Please try again.",
       });
+      resetRecaptcha();
     } finally {
       setIsLoading(false);
     }
@@ -178,7 +160,6 @@ const SignUpPage = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-    // For phone number, allow only digits and limit to 10
     if (name === 'phone') {
       const digitsOnly = value.replace(/\D/g, '');
       if (digitsOnly.length <= 10) {
@@ -211,27 +192,17 @@ const SignUpPage = () => {
     <div className="min-h-screen bg-background flex flex-col relative">
       <ProfessionalNavbar hideAuthOptions={true} />
       <div className="min-h-screen flex">
-
         {/* Left side - Hero Image */}
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-          {/* Background Image */}
           <div
             className="absolute inset-0 bg-cover bg-center"
             style={{ backgroundImage: "url('/SignupPic.jpg')" }}
           />
-
-          {/* Dark/Light Theme Overlay - appears above background image with reduced opacity */}
           <div className="absolute inset-0 bg-background/20 dark:bg-background/30" />
-
-          {/* Background Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-accent/30 to-primary/40 dark:from-primary/50 dark:via-accent/40 dark:to-primary/50" />
-
-          {/* Foreground Content */}
           <div className="relative z-10 flex flex-col justify-center p-12 text-foreground">
-            {/* You can add signup-related content here later if needed */}
           </div>
         </div>
-
 
         {/* Right side - Sign Up Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-background">
@@ -360,7 +331,6 @@ const SignUpPage = () => {
                       </Button>
                     </div>
 
-                    {/* Password Strength Indicator */}
                     {formData.password && (
                       <div className="mt-2 space-y-2">
                         <div className="flex items-center justify-between">
@@ -433,76 +403,16 @@ const SignUpPage = () => {
                     )}
                   </div>
 
-                  {/* Enhanced Robot Verification with Visual Captcha */}
+                  {/* Human Verification */}
                   <div className="space-y-3">
                     <Label className="text-sm font-medium">Human Verification</Label>
-                    <div className="border border-border/50 rounded-lg p-4 bg-card/30">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center space-x-2">
-                          <Shield className={`w-5 h-5 ${robotVerified ? 'text-green-500' : 'text-muted-foreground'}`} />
-                          <span className="text-sm font-medium">
-                            {robotVerified ? 'Verified' : 'Please verify you are not a robot'}
-                          </span>
-                        </div>
-                        {robotVerified && (
-                          <Check className="w-5 h-5 text-green-500" />
-                        )}
-                      </div>
-
-                      {!robotVerified && (
-                        <div className="space-y-3">
-                          <div className="flex items-center space-x-2">
-                            <div
-                              className="px-4 py-2 bg-gradient-to-r from-blue-100 to-purple-100 border border-gray-300 rounded font-mono text-lg tracking-wider select-none"
-                              style={{
-                                background: 'linear-gradient(45deg, #be972cff, #99572bff)',
-                                fontFamily: 'monospace',
-                                fontSize: '18px',
-                                letterSpacing: '4px',
-                                textDecoration: 'line-through',
-                                textDecorationStyle: 'wavy',
-                                textShadow: '1px 1px 2px rgba(0,0,0,0.1)'
-                              }}
-                            >
-                              {captchaCode}
-                            </div>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={generateCaptcha}
-                              className="p-2"
-                            >
-                              <RefreshCw className="w-4 h-4" />
-                            </Button>
-                          </div>
-
-                          <div className="flex space-x-2">
-                            <Input
-                              id="captcha"
-                              type="text"
-                              placeholder="Enter the code above"
-                              value={userCaptchaInput}
-                              onChange={(e) => setUserCaptchaInput(e.target.value)}
-                              maxLength={6}
-                              className={`
-                              bg-card/50 border-border/50 focus:border-primary transition-colors
-                              flex-1 
-                            `}
-                              required
-                            />
-
-                            <Button
-                              type="button"
-                              onClick={verifyCaptcha}
-                              disabled={userCaptchaInput.length !== 6}
-                              className="px-4 py-2 bg-primary hover:bg-primary/90"
-                            >
-                              Verify
-                            </Button>
-                          </div>
-                        </div>
-                      )}
+                    <div className="border border-border/50 rounded-lg p-4 bg-card/30 flex justify-center">
+                      <ReCAPTCHA
+                        ref={recaptchaRef}
+                        sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                        onChange={handleRecaptchaChange}
+                        theme={document.documentElement.classList.contains('dark') ? 'dark' : 'light'}
+                      />
                     </div>
                   </div>
 
@@ -521,7 +431,6 @@ const SignUpPage = () => {
                           className="text-sm cursor-pointer leading-relaxed"
                         >
                           I agree to the{' '}
-                          
                           <Link
                             to="/privacy"
                             className="text-primary hover:text-primary-glow underline"
@@ -570,7 +479,6 @@ const SignUpPage = () => {
         </div>
       </div>
     </div>
-
   );
 };
 

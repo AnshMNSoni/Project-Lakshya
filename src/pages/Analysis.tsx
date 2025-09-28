@@ -28,7 +28,7 @@ const Analysis = () => {
                 <Brain className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-bold font-space-grotesk">Smart Analysis</h1>
+                <h1 className="text-lg font-bold font-space-grotesk">Technical Analysis</h1>
               </div>
             </div>
           </div>

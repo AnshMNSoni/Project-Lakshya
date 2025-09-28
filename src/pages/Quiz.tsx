@@ -165,24 +165,24 @@ const Quiz = () => {
         </div>
       </header>
 
-      {/* Smart Analysis Section */}
+      {/* Technical Analysis Section */}
       {!isSmartAnalysisDone ? (
         <div className="text-center py-8 animate-fade-in">
           <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
         <Star className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
           </div>
           <h3 className="text-xl sm:text-2xl font-bold font-space-grotesk mb-2 sm:mb-4">
-        Smart Analysis Required
+        Technical Analysis Required
           </h3>
           <p className="text-sm sm:text-base text-muted-foreground mb-6 max-w-md mx-auto">
-        Before we begin the personality assessment, we need to perform a smart analysis to personalize your experience.
+        Before we begin the personality assessment, we need to perform a Technical Analysis to personalize your experience.
           </p>
           <Button
         className="bg-gradient-primary hover:bg-gradient-primary/90 text-white px-6 py-3 rounded-full transition-transform hover:scale-105"
         onClick={() => navigate("/smart-analysis")}
           >
         <Star className="w-4 h-4 mr-2" />
-        Start Smart Analysis
+        Start Technical Analysis
           </Button>
         </div>
       ) : (

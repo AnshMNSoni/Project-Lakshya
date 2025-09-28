@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,6 +8,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   ArrowLeft,
   Sparkles,
@@ -23,16 +25,34 @@ import {
   Users,
   Award,
   Lightbulb,
+  Pencil,
+  Save,
+  Loader2,
 } from "lucide-react";
 import Footer from "@/components/layout/Footer";
 import { AnimatedThemeToggler } from "@/magicui/animated-theme-toggler";
 import { LakshyaBreadcrumb } from "@/components/common/LakshyaBreadcrumb";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const SmartAnalysis = () => {
-  const { userProfile } = useAuth();
+  const { userProfile, user, refreshProfile } = useAuth();
+  const { toast } = useToast();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [interests, setInterests] = useState(userProfile?.academic_info?.interests || "");
+  const [aspirations, setAspirations] = useState(userProfile?.academic_info?.aspirations || "");
   const navigate = useNavigate();
+
+  // Sync state with userProfile data
+  useEffect(() => {
+    if (userProfile?.academic_info) {
+      setInterests(userProfile.academic_info.interests || "");
+      setAspirations(userProfile.academic_info.aspirations || "");
+    }
+  }, [userProfile]);
 
   const analysisFeatures = [
     {
@@ -107,12 +127,71 @@ const SmartAnalysis = () => {
 
   const handleAnalysisStart = () => {
     setIsAnalyzing(true);
-    // Set flag in localStorage to allow quiz access
     localStorage.setItem("quizAccessAllowed", "true");
-    // Simulate analysis process
     setTimeout(() => {
       navigate("/quiz");
     }, 3000);
+  };
+
+  const handleSave = async () => {
+    if (!user || !userProfile) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "User not found. Please try logging in again.",
+      });
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      // Prepare the updated academic info
+      const updatedAcademicInfo = {
+        ...userProfile.academic_info,
+        interests: interests.trim(),
+        aspirations: aspirations.trim(),
+      };
+
+      // Update profile in database
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          academic_info: updatedAcademicInfo,
+        })
+        .eq('user_id', user.id);
+
+      if (error) {
+        throw error;
+      }
+
+      // Refresh profile data to get updated information
+      await refreshProfile();
+
+      toast({
+        title: "Profile Updated",
+        description: "Your interests and aspirations have been saved successfully.",
+      });
+
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        variant: "destructive",
+        title: "Update Failed",
+        description: "Failed to save changes. Please try again.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleEditToggle = () => {
+    if (isEditing) {
+      handleSave();
+    } else {
+      setIsEditing(true);
+    }
   };
 
   return (
@@ -157,7 +236,7 @@ const SmartAnalysis = () => {
             <Brain className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold font-space-grotesk mb-4 sm:mb-6">
-            Smart <span className="gradient-text">Analysis</span>
+            Technical <span className="gradient-text">Analysis</span>
           </h1>
           <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4 mb-6">
             Discover your true potential with our AI-powered comprehensive
@@ -185,12 +264,38 @@ const SmartAnalysis = () => {
         {/* User Profile Card */}
         {userProfile && (
           <Card className="glass-effect hover:shadow-card transition-all duration-300 mb-12 animate-slide-up border-l-4 border-l-gradient-primary">
-            <CardHeader>
-              <CardTitle className="text-xl flex items-center gap-2">
-                <Target className="w-5 h-5 text-primary" />
-                Your Current Profile
-              </CardTitle>
-              <CardDescription>Based on your provided information</CardDescription>
+            <CardHeader className="flex flex-row justify-between items-start">
+              <div>
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <Target className="w-5 h-5 text-primary" />
+                  Your Current Profile
+                </CardTitle>
+                <CardDescription>Based on your provided information</CardDescription>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleEditToggle}
+                disabled={isSaving}
+                className="flex items-center gap-1"
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span className="hidden sm:inline">Saving...</span>
+                  </>
+                ) : isEditing ? (
+                  <>
+                    <Save className="w-4 h-4" />
+                    <span className="hidden sm:inline">Save</span>
+                  </>
+                ) : (
+                  <>
+                    <Pencil className="w-4 h-4" />
+                    <span className="hidden sm:inline">Edit</span>
+                  </>
+                )}
+              </Button>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
@@ -199,20 +304,40 @@ const SmartAnalysis = () => {
                     <Lightbulb className="w-4 h-4 text-yellow-500" />
                     Areas of Interest
                   </h4>
-                  <p className="text-sm text-muted-foreground">
-                    {userProfile?.academic_info?.interests ||
-                      "Not provided - we'll help you discover them!"}
-                  </p>
+                  {isEditing ? (
+                    <Textarea
+                      value={interests}
+                      onChange={(e) => setInterests(e.target.value)}
+                      placeholder="Enter your areas of interest (e.g., Technology, Science, Arts, Sports, etc.)"
+                      className="w-full min-h-[80px] resize-none"
+                      rows={3}
+                    />
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      {userProfile?.academic_info?.interests ||
+                        "Not provided - we'll help you discover them!"}
+                    </p>
+                  )}
                 </div>
                 <div className="p-4 bg-muted/30 rounded-lg">
                   <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
                     <Award className="w-4 h-4 text-green-500" />
                     Career Aspirations
                   </h4>
-                  <p className="text-sm text-muted-foreground">
-                    {userProfile?.academic_info?.aspirations ||
-                      "Not provided - let's explore your potential!"}
-                  </p>
+                  {isEditing ? (
+                    <Textarea
+                      value={aspirations}
+                      onChange={(e) => setAspirations(e.target.value)}
+                      placeholder="Enter your career aspirations and goals (e.g., Software Engineer, Doctor, Teacher, etc.)"
+                      className="w-full min-h-[80px] resize-none"
+                      rows={3}
+                    />
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      {userProfile?.academic_info?.aspirations ||
+                        "Not provided - let's explore your potential!"}
+                    </p>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -267,7 +392,6 @@ const SmartAnalysis = () => {
         <div className="text-center animate-slide-up">
           <Card className="glass-effect max-w-2xl mx-auto overflow-hidden">
             <CardContent className="p-8 relative">
-              {/* Background decoration */}
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-primary opacity-5 rounded-full -translate-y-16 translate-x-16"></div>
               <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-primary opacity-5 rounded-full translate-y-12 -translate-x-12"></div>
 
