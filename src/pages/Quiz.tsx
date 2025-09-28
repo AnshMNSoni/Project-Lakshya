@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ArrowLeft, BookOpen, CheckCircle, Star } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, CheckCircle, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast"; // Added for toast notifications
 
 const Quiz = () => {
@@ -64,19 +64,36 @@ const Quiz = () => {
   // 🔹 Progress bar %
   const progress = ((globalIndex + 1) / allQuestions.length) * 100;
 
-  // 🔹 Handle answer selection with auto-increment
+  // 🔹 Handle answer selection (NO auto-increment)
   const handleAnswer = (questionId: number, option: string) => {
     setAnswers((prev) => ({ ...prev, [questionId]: option }));
-    // Auto-increment to next question or step
-    if (globalIndex + 1 < allQuestions.length) {
-      if (currentQuestionIndex < questions.length - 1) {
-        setCurrentQuestionIndex(currentQuestionIndex + 1);
-      } else {
-        setCurrentStep(currentStep + 1);
-      }
+    // Removed auto-increment logic here
+  };
+  // ... (before handleSubmit)
+
+  // 🔹 Handle Next button click
+  const handleNext = () => {
+    // 🛑 Ensure an answer is selected before proceeding
+    if (!answers[currentQuestion.id]) {
+      toast({
+        title: "Wait!",
+        description: "Please select an option before proceeding.",
+        variant: "warning", // Assuming you have a 'warning' variant or similar
+      });
+      return;
+    }
+
+    // If there are more questions in the current step
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    }
+    // If this is the last question of the current step, move to the next step
+    else if (currentStep < 3) { // Assuming 3 is the max step number
+      setCurrentStep(currentStep + 1);
     }
   };
 
+  // ... (rest of handleSubmit)
   // 🔹 Submit answers to Flask backend and navigate to Quiz2
   const handleSubmit = async () => {
     const counts = [0, 0, 0, 0, 0];
@@ -169,96 +186,111 @@ const Quiz = () => {
       {!isSmartAnalysisDone ? (
         <div className="text-center py-8 animate-fade-in">
           <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
-        <Star className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
+            <Star className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
           </div>
           <h3 className="text-xl sm:text-2xl font-bold font-space-grotesk mb-2 sm:mb-4">
-        Smart Analysis Required
+            Smart Analysis Required
           </h3>
           <p className="text-sm sm:text-base text-muted-foreground mb-6 max-w-md mx-auto">
-        Before we begin the personality assessment, we need to perform a smart analysis to personalize your experience.
+            Before we begin the personality assessment, we need to perform a smart analysis to personalize your experience.
           </p>
           <Button
-        className="bg-gradient-primary hover:bg-gradient-primary/90 text-white px-6 py-3 rounded-full transition-transform hover:scale-105"
-        onClick={() => navigate("/smart-analysis")}
+            className="bg-gradient-primary hover:bg-gradient-primary/90 text-white px-6 py-3 rounded-full transition-transform hover:scale-105"
+            onClick={() => navigate("/smart-analysis")}
           >
-        <Star className="w-4 h-4 mr-2" />
-        Start Smart Analysis
+            <Star className="w-4 h-4 mr-2" />
+            Start Smart Analysis
           </Button>
         </div>
       ) : (
         <>
           {/* Progress Bar */}
           <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-        <div
-          className="bg-gradient-primary h-2 rounded-full transition-all duration-300"
-          style={{ width: `${progress}%` }}
-        />
+            <div
+              className="bg-gradient-primary h-2 rounded-full transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            />
           </div>
 
           {/* Question Header */}
           <h3 className="font-semibold text-sm sm:text-base mb-2 sm:mb-4">
-        Question {globalIndex + 1} of {allQuestions.length}:
+            Question {globalIndex + 1} of {allQuestions.length}:
           </h3>
 
           {/* Question Text */}
           <p className="mb-2 sm:mb-4 text-sm sm:text-base">
-        {currentQuestion?.text || "Loading..."}
+            {currentQuestion?.text || "Loading..."}
           </p>
 
           {/* Options */}
           <div className="flex flex-col space-y-2 sm:space-y-3">
-        {[
-          "Disagree",
-          "Slightly disagree",
-          "Neutral",
-          "Slightly agree",
-          "Agree",
-        ].map((option) => (
-          <Button
-            key={option}
-            variant={
-          answers[currentQuestion?.id] === option
-            ? "default"
-            : "outline"
-            }
-            className={`w-full h-auto py-1 sm:py-2 px-2 sm:px-4 text-xs sm:text-sm text-left ${answers[currentQuestion?.id] === option
-          ? "bg-gradient-primary"
-          : ""
-          } whitespace-normal break-words`}
-            onClick={() =>
-          handleAnswer(currentQuestion?.id, option)
-            }
-            disabled={!currentQuestion}
-          >
-            {option}
-          </Button>
-        ))}
+            {[
+              "Disagree",
+              "Slightly disagree",
+              "Neutral",
+              "Slightly agree",
+              "Agree",
+            ].map((option) => (
+              <Button
+                key={option}
+                variant={
+                  answers[currentQuestion?.id] === option
+                    ? "default"
+                    : "outline"
+                }
+                className={`w-full h-auto py-1 sm:py-2 px-2 sm:px-4 text-xs sm:text-sm text-left ${answers[currentQuestion?.id] === option
+                  ? "bg-gradient-primary"
+                  : ""
+                  } whitespace-normal break-words`}
+                onClick={() =>
+                  handleAnswer(currentQuestion?.id, option)
+                }
+                disabled={!currentQuestion}
+              >
+                {option}
+              </Button>
+            ))}
           </div>
 
           {/* Navigation Buttons */}
-          <div className="flex justify-between mt-4">
-        <Button
-          onClick={() =>
-            currentQuestionIndex > 0
-          ? setCurrentQuestionIndex(
-            currentQuestionIndex - 1
-          )
-          : setCurrentStep(currentStep - 1)
-          }
-          disabled={currentStep === 1 && currentQuestionIndex === 0}
-          className="bg-gradient-primary hover:bg-gradient-primary/90"
-        >
-          Previous
-        </Button>
+          <div className="flex justify-between mt-6"> {/* Aesthetic contrast and spacing */}
+            <Button
+              onClick={() => {
+                // Logic to go back: if not the first question of the step, go back a question, otherwise go back a step.
+                if (currentQuestionIndex > 0) {
+                  setCurrentQuestionIndex(currentQuestionIndex - 1);
+                } else if (currentStep > 1) {
+                  // Correctly go to the last question of the previous step
+                  const prevQuestions = getQuestionsForStep().filter(q => q.step === currentStep - 1);
+                  setCurrentStep(currentStep - 1);
+                  setCurrentQuestionIndex(prevQuestions.length - 1);
+                }
+              }}
+              disabled={currentStep === 1 && currentQuestionIndex === 0}
+              variant="outline" // Changed for visual hierarchy
+              className="border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800"
+            >
+              Previous
+            </Button>
 
-        {globalIndex + 1 === allQuestions.length && (
-          <Button
-            onClick={handleSubmit}
-            className="bg-gradient-primary hover:bg-gradient-primary/90"
-          >
-            Start Quiz 2
-          </Button>
-        )}
+            {/* Next/Submit Button */}
+            {(globalIndex + 1 < allQuestions.length) ? (
+              <Button
+                onClick={handleNext}
+                disabled={!currentQuestion || !answers[currentQuestion?.id]} // Disabled until an answer is selected
+                className="bg-primary hover:bg-primary/90 text-white font-semibold transition-transform duration-150 ease-in-out shadow-lg shadow-primary/50" // Contrasting primary style
+              >
+                Next <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            ) : (
+              <Button
+                onClick={handleSubmit}
+                disabled={!currentQuestion || !answers[currentQuestion?.id]} // Should also be disabled on final question if no answer
+                className="bg-green-600 hover:bg-green-700 text-white font-semibold transition-transform duration-150 ease-in-out shadow-lg shadow-green-600/50" // Distinct "Submit/Success" color
+              >
+                Start Quiz 2
+              </Button>
+            )}
           </div>
         </>
       )}
@@ -388,25 +420,40 @@ const Quiz = () => {
                   </div>
 
                   {/* Navigation Buttons */}
-                  <div className="flex justify-between mt-4">
+                  <div className="flex justify-between mt-6"> {/* Aesthetic contrast and spacing */}
                     <Button
-                      onClick={() =>
-                        currentQuestionIndex > 0
-                          ? setCurrentQuestionIndex(
-                            currentQuestionIndex - 1
-                          )
-                          : setCurrentStep(currentStep - 1)
-                      }
+                      onClick={() => {
+                        // Logic to go back: if not the first question of the step, go back a question, otherwise go back a step.
+                        if (currentQuestionIndex > 0) {
+                          setCurrentQuestionIndex(currentQuestionIndex - 1);
+                        } else if (currentStep > 1) {
+                          // Correctly go to the last question of the previous step
+                          const prevQuestions = getQuestionsForStep().filter(q => q.step === currentStep - 1);
+                          setCurrentStep(currentStep - 1);
+                          setCurrentQuestionIndex(prevQuestions.length - 1);
+                        }
+                      }}
                       disabled={currentStep === 1 && currentQuestionIndex === 0}
-                      className="bg-gradient-primary hover:bg-gradient-primary/90"
+                      variant="outline" // Changed for visual hierarchy
+                      className="border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800"
                     >
                       Previous
                     </Button>
 
-                    {globalIndex + 1 === allQuestions.length && (
+                    {/* Next/Submit Button */}
+                    {(globalIndex + 1 < allQuestions.length) ? (
+                      <Button
+                        onClick={handleNext}
+                        disabled={!currentQuestion || !answers[currentQuestion?.id]} // Disabled until an answer is selected
+                        className="bg-primary hover:bg-primary/90 text-white font-semibold transition-transform duration-150 ease-in-out shadow-lg shadow-primary/50" // Contrasting primary style
+                      >
+                        Next <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    ) : (
                       <Button
                         onClick={handleSubmit}
-                        className="bg-gradient-primary hover:bg-gradient-primary/90"
+                        disabled={!currentQuestion || !answers[currentQuestion?.id]} // Should also be disabled on final question if no answer
+                        className="bg-green-600 hover:bg-green-700 text-white font-semibold transition-transform duration-150 ease-in-out shadow-lg shadow-green-600/50" // Distinct "Submit/Success" color
                       >
                         Start Quiz 2
                       </Button>
