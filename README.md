@@ -1,6 +1,3 @@
-### Progress Status: 🟢 Active 
-
-One Stop Career Smart Career Advisor
 # 🎯 Project-Lakshya: Your Personal AI Career Guide  
 <p align="center">
   <img src="https://img.shields.io/github/license/AnshMNSoni/Project-Lakshya?style=flat-square" alt="License" style="margin: 0 30px;">
@@ -127,6 +124,10 @@ git clone https://github.com/AnshMNSoni/Project-Lakshya.git
 cd Project-Lakshya
 ```
 ### ▶️ Running the Application Through link
+```bash
+https://project-lakshya.lovable.app/
+```
+
 ### Screenshot
 - login page
 <img width="1755" height="3527" alt="image" src="https://github.com/user-attachments/assets/8a171874-cb90-4c44-9d6f-a74159c8d7ed" />
