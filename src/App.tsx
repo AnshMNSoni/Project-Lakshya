@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./hooks/useAuth";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import Loader from "@/components/ui/loader";
+
+// Pages
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import SignInPage from "./components/auth/SignInPage";
@@ -42,9 +44,10 @@ const App = () => {
           <TooltipProvider>
             <Toaster />
             <Sonner />
-            <Loader isLoading={isLoading} />
-            {!isLoading && (
-              <BrowserRouter>
+            <BrowserRouter>
+              {/* Loader overlays everything */}
+              <Loader isLoading={isLoading} />
+              {!isLoading && (
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/sign-in" element={<SignInPage />} />
@@ -62,8 +65,8 @@ const App = () => {
                   <Route path="/smart-analysis" element={<SmartAnalysis />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
-              </BrowserRouter>
-            )}
+              )}
+            </BrowserRouter>
           </TooltipProvider>
         </AuthProvider>
       </ThemeProvider>
