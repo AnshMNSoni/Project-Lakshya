@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,7 @@ const SignUpPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [robotVerified, setRobotVerified] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [recaptchaTheme, setRecaptchaTheme] = useState('light');
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -26,15 +27,33 @@ const SignUpPage = () => {
   });
   const { toast } = useToast();
   const navigate = useNavigate();
-  const recaptchaRef = useRef<ReCAPTCHA>(null);
+  const recaptchaRef = useRef(null); // Removed generic type for broader compatibility
 
-  // New handler for reCAPTCHA changes
-  const handleRecaptchaChange = (token: string | null) => {
-    if (token) {
-      setRobotVerified(true);
+  const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+
+  // Log site key for debugging (masked for security)
+  useEffect(() => {
+    if (siteKey) {
+      console.log('reCAPTCHA site key loaded:', siteKey ? `${siteKey.substring(0, 10)}...` : 'undefined');
     } else {
-      setRobotVerified(false);
+      console.error('reCAPTCHA site key missing! Check VITE_RECAPTCHA_SITE_KEY env var.');
     }
+
+    // Set initial theme
+    const isDark = document.documentElement.classList.contains('dark');
+    setRecaptchaTheme(isDark ? 'dark' : 'light');
+  }, []);
+
+  const resetRecaptcha = () => {
+    recaptchaRef.current?.reset();
+    setRobotVerified(false);
+    console.log('reCAPTCHA reset');
+  };
+
+  // Handler for reCAPTCHA changes
+  const handleRecaptchaChange = (token) => {
+    console.log('reCAPTCHA token:', token ? 'received' : 'cleared');
+    setRobotVerified(!!token);
   };
 
   // Password strength validation
@@ -59,13 +78,27 @@ const SignUpPage = () => {
   const passwordValidation = validatePassword(formData.password);
   const isMobileValid = validateMobileNumber(formData.phone);
 
+  // Early bail if no site key
+  if (!siteKey) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-8">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-8 text-center">
+            <h2 className="text-2xl font-bold mb-4">Configuration Error</h2>
+            <p className="text-muted-foreground mb-4">
+              reCAPTCHA is not configured. Please contact support to set up VITE_RECAPTCHA_SITE_KEY.
+            </p>
+            <Button asChild>
+              <Link to="/sign-in">Go to Sign In</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const resetRecaptcha = () => {
-      recaptchaRef.current?.reset();
-      setRobotVerified(false);
-    }
 
     if (!robotVerified) {
       toast({
@@ -73,6 +106,7 @@ const SignUpPage = () => {
         title: "Verification Required",
         description: "Please complete the 'I'm not a robot' check.",
       });
+      resetRecaptcha();
       return;
     }
 
@@ -143,6 +177,7 @@ const SignUpPage = () => {
           title: "Account Created Successfully!",
           description: "Please check your email to verify your account.",
         });
+        resetRecaptcha(); // Reset after success for clean state
         navigate('/sign-in');
       }
     } catch (error) {
@@ -322,6 +357,7 @@ const SignUpPage = () => {
                         size="sm"
                         className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                         onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? "Hide password" : "Show password"}
                       >
                         {showPassword ? (
                           <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -388,6 +424,7 @@ const SignUpPage = () => {
                         size="sm"
                         className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                       >
                         {showConfirmPassword ? (
                           <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -409,9 +446,10 @@ const SignUpPage = () => {
                     <div className="border border-border/50 rounded-lg p-4 bg-card/30 flex justify-center">
                       <ReCAPTCHA
                         ref={recaptchaRef}
-                        sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                        sitekey={siteKey}
                         onChange={handleRecaptchaChange}
-                        theme={document.documentElement.classList.contains('dark') ? 'dark' : 'light'}
+                        theme={recaptchaTheme}
+                        aria-label="reCAPTCHA verification"
                       />
                     </div>
                   </div>
