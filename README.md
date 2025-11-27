@@ -1,4 +1,4 @@
-# 🎯 Project-Lakshya: Your Personal AI Career Guide  
+# 🎯 Project-Lakshya: Your Smart Career Guide  
 <p align="center">
   <img src="https://img.shields.io/github/license/AnshMNSoni/Project-Lakshya?style=flat-square" alt="License" style="margin: 0 30px;">
   <img src="https://img.shields.io/github/issues/AnshMNSoni/Project-Lakshya?style=flat-square" alt="Issues" style="margin: 0 30px;">
