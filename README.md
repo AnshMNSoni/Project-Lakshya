@@ -5,7 +5,6 @@
   <img src="https://img.shields.io/github/forks/AnshMNSoni/Project-Lakshya?style=flat-square" alt="Forks" style="margin:0 30px;">
 </p>
 
----
 
 ## 🌟 Overview  
 <p align="center">
@@ -14,7 +13,6 @@
 
 **Project-Lakshya** is an intelligent, full-stack web application designed to help students discover their ideal career path through **personalized assessments** and **AI-driven recommendations**.  
 
----
 
 ## ✨ Core Features  
 
@@ -24,7 +22,6 @@
 - **Smart Institution Search**: Suggests colleges and auto-fills location data for faster profile setup.  
 - **Interactive Dashboard**: Central hub to view results, track progress, and access platform features.  
 
----
 
 ## Key Project Highlights  
 
@@ -38,22 +35,18 @@
 | Backend Logic      | 7                        |
 | Scalability        | 7                        |
 
----
-
 ### 2. Assessment Composition  
 
 - **Personality & Trait Analysis** → 50%  
 - **Academic Interests** → 30%  
 - **Skill Evaluation** → 20%  
 
----
 
 ### 3. Seamless User Journey  
 <p align="center" >
 <kbd><b>Create Profile</b></kbd>→<kbd><b>Take Assessments</b></kbd>→ <kbd><b>AI Analysis</b></kbd> →<kbd><b>View Results</b></kbd>
 </p>
 
----
 
 ## 🛠 Technology Stack  
 
@@ -64,7 +57,6 @@
 | **Database & Auth** | Supabase (PostgreSQL, Authentication, Storage) |
 | **Package Manager** | npm (Frontend), pip (Backend) |
 
----
 
 ## 🚀 Getting Started  
 
@@ -77,7 +69,6 @@ Ensure you have installed:
 - [Node.js](https://nodejs.org/) (v18.x or later) & npm  
 - [Python](https://www.python.org/) (v3.9 or later) & pip  
 
----
 
 ### ⚙️ Installation & Setup  
 
@@ -161,7 +152,6 @@ https://project-lakshya.lovable.app/
 - details of college
 <img width="1755" height="813" alt="image" src="https://github.com/user-attachments/assets/de34f1ff-ca2e-4448-a789-d044c761e3b9" />
 
----
 
 ## 🤝 Contributing  
 
@@ -173,7 +163,6 @@ Contributions are welcome! 🎉
 4. Push to branch (`git push origin feature/NewFeature`)  
 5. Open a Pull Request  
 
----
 
 ## 📄 License  
 
