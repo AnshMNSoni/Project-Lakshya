@@ -1,4 +1,4 @@
-# 🎯 Project-Lakshya: Your Smart Career Guide  
+# 🎯 Project-Lakshya: Your Smart Career and Education Guide
 <p align="center">
   <img src="https://img.shields.io/github/license/AnshMNSoni/Project-Lakshya?style=flat-square" alt="License" style="margin: 0 30px;">
   <img src="https://img.shields.io/github/stars/AnshMNSoni/Project-Lakshya?style=flat-square" alt="Stars" style="margin: 0 30px;">
